@@ -1,0 +1,16 @@
+@import 'normalize.css/normalize.css';
+@import 'basscss/css/basscss.min.css';
+@import './fontello/css/fontello-embedded.css';
+@import './fontello/css/animation.css';
+@import './variables.css';
+
+* {
+  color: #333;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  padding-bottom: 3rem;
+}
+
