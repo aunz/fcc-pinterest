@@ -1,7 +1,7 @@
 module.exports = {
-  "extends": "standard",
+  extends: ['standard', 'standard-react'],
   rules: {
     'comma-dangle': 0,
     'space-before-function-paren': 0,
   }
-};
+}
