@@ -4,7 +4,6 @@ import { Query } from 'react-apollo'
 
 import './styles/index.css'
 
-
 class App extends Component {
   constructor(props) {
     super(props)

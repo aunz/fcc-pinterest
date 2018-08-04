@@ -25,6 +25,7 @@
     "eslint": "^5.2.0",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-config-standard": "^11.0.0",
+    "eslint-config-standard-react": "^6.0.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-node": "^7.0.1",
@@ -43,6 +44,7 @@
     "postcss-url": "^7.3.2",
     "raw-loader": "^0.5.1",
     "react": "^16.4.1",
+    "react-apollo": "^2.1.9",
     "react-dom": "^16.4.1",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
@@ -58,6 +60,7 @@
     "express": "^4.16.3",
     "graphql": "^14.0.0-rc.2",
     "helmet": "^3.13.0",
+    "source-map-support": "^0.5.6",
     "validator": "^10.5.0"
   }
 }

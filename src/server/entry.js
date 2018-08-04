@@ -1,3 +1,4 @@
+import 'source-map-support/register'
 import 'dotenv/config'
 import express from 'express'
 import helmet from 'helmet'
