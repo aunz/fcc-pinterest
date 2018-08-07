@@ -12,3 +12,10 @@ create table "user" (
 );
 
 
+create table pin (
+  id int not null primary key,
+  ts int not null default (strftime('%s','now')),
+  uid int not null references "user" (id),
+  "name" tex, -- the title of the pin
+  url text not null
+)
