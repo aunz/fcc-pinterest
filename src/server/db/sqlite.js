@@ -14,7 +14,7 @@ db.transaction = memoize(db.transaction)
 if (process.env.NODE_ENV === 'production') {
   // make sure tables exist
   db.prepare(`
-    select 
+    select
       (select 1 from "user" limit 1)
   `).get()
 }

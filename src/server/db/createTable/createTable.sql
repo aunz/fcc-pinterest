@@ -18,4 +18,4 @@ create table pin (
   uid int not null references "user" (id),
   "name" tex, -- the title of the pin
   url text not null
-)
+;
