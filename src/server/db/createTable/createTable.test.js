@@ -22,7 +22,7 @@ test('init', t => {
   t.end()
 })
 
-test('constrain', t => {
+test('constrain', s, t => {
   t.throw(() => {
     db.prepare('insert into "user" (id, email) values (?, ?)').run(100, 'T@Test.COM')
   }, /unique/i, 'email has to be unique')
@@ -75,7 +75,7 @@ test('constrain', t => {
     db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '?url1.com')
   }, /unique/i, 'url is invalid')
 
-    t.throw(() => {
+  t.throw(() => {
     db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '123')
   }, /unique/i, 'url is invalid')
 
