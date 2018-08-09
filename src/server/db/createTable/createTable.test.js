@@ -12,12 +12,12 @@ test('init', t => {
   db.prepare('insert into "user" (id, gh_name) values (?, ?)').run(4, 'gh1')
 
   // create pin
-  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(1, 1, '', 'url1')
-  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(2, 1, null, 'url2')
-  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(3, 2, '', 'url3')
-  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(4, 2, null, 'url4')
-  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(5, 3, '', 'url5')
-  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(6, 3, null, 'url6')
+  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(1, 1, '', 'www.url1.com')
+  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(2, 1, null, 'www.url2.com')
+  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(3, 2, '', 'www.url3.com')
+  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(4, 2, null, 'www.url4.com')
+  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(5, 3, '', 'www.url5.com')
+  db.prepare('insert into pin (id, uid, title, url) values (?, ?, ?, ?)').run(6, 3, null, 'www.url6.com')
 
   t.end()
 })
@@ -48,7 +48,7 @@ test('constrain', t => {
   }, /unique/i, 'gh_name is not long enough')
 
   t.throw(() => {
-    db.prepare('insert into pin (id, url) values (?, ?)').run(100, 'u1')
+    db.prepare('insert into pin (id, url) values (?, ?)').run(100, 'www.url1.com')
   }, /unique/i, 'uid is required for pin')
 
   t.throw(() => {
@@ -56,7 +56,16 @@ test('constrain', t => {
   }, /unique/i, 'uid needs to references "user"')
 
   t.throw(() => {
-    db.prepare('insert into pin (id, uid) values (?, ?)').run(100, 1)
-  }, /unique/i, 'url cannot be null')
+    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, 1)
+  }, /unique/i, 'url is invalid')
+
+  t.throw(() => {
+    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, ' url1.com')
+  }, /unique/i, 'url is invalid')
+
+  t.throw(() => {
+    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '.url1.com')
+  }, /unique/i, 'url is invalid')
+
   t.end()
 })
