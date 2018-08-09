@@ -67,5 +67,17 @@ test('constrain', t => {
     db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '.url1.com')
   }, /unique/i, 'url is invalid')
 
+  t.throw(() => {
+    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '-url1.com')
+  }, /unique/i, 'url is invalid')
+
+  t.throw(() => {
+    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '?url1.com')
+  }, /unique/i, 'url is invalid')
+
+    t.throw(() => {
+    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '123')
+  }, /unique/i, 'url is invalid')
+
   t.end()
 })
