@@ -29,55 +29,43 @@ test('constrain', t => {
 
   t.throws(() => {
     db.prepare('insert into "user" (id, email) values (?, ?)').run(100, '   t@t  ')
-  }, /unique/i, 'email has to match email regexp')
+  }, /check constrain/i, 'email has to match email regexp')
 
   t.throws(() => {
     db.prepare('insert into "user" (id, email) values (?, ?)').run(100, '   t.t.com  ')
-  }, /unique/i, 'email has to match email regexp')
+  }, /check constrain/i, 'email has to match email regexp')
 
   t.throws(() => {
-    db.prepare('insert into "user" (id, gh) values (?, ?, ?)').run(100, 123)
+    db.prepare('insert into "user" (id, gh) values (?, ?)').run(100, 123)
   }, /unique/i, 'gh id has to be unique')
 
   t.throws(() => {
-    db.prepare('insert into "user" (id, gh_name) values (?, ?, ?)').run(100, '  GH1  ')
+    db.prepare('insert into "user" (id, gh_name) values (?, ?)').run(100, '  GH1  ')
   }, /unique/i, 'gh_name has to be unique')
 
   t.throws(() => {
     db.prepare('insert into "user" (id, gh_name) values (?, ?)').run(100, '  gh ')
-  }, /unique/i, 'gh_name is not long enough')
+  }, /check constrain/i, 'gh_name is not long enough')
 
   t.throws(() => {
     db.prepare('insert into pin (id, url) values (?, ?)').run(100, 'www.url1.com')
-  }, /unique/i, 'uid is required for pin')
+  }, /null constrain/i, 'uid is required for pin')
 
   t.throws(() => {
-    db.prepare('insert into pin (id, uid) values (?, ?)').run(100, 100)
-  }, /unique/i, 'uid needs to references "user"')
+    db.prepare('insert into pin (id, url, uid) values (?, ?, ?)').run(100, 'www.url1.com', 100)
+  }, /foreign/i, 'uid needs to references "user"')
 
   t.throws(() => {
-    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, 1)
-  }, /unique/i, 'url is invalid')
+    db.prepare('insert into pin (id, uid, url) values (?, ?, ?)').run(100, 1, '1')
+  }, /check constrain/i, 'url is invalid')
 
   t.throws(() => {
-    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, ' url1.com')
-  }, /unique/i, 'url is invalid')
+    db.prepare('insert into pin (id, uid, url) values (?, ?, ?)').run(100, 1, '.com')
+  }, /check constrain/i, 'url is invalid')
 
   t.throws(() => {
-    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '.url1.com')
-  }, /unique/i, 'url is invalid')
-
-  t.throws(() => {
-    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '-url1.com')
-  }, /unique/i, 'url is invalid')
-
-  t.throws(() => {
-    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '?url1.com')
-  }, /unique/i, 'url is invalid')
-
-  t.throws(() => {
-    db.prepare('insert into pin (id, uid, url) values (?, ?)').run(100, 1, '123')
-  }, /unique/i, 'url is invalid')
+    db.prepare('insert into pin (id, uid, url) values (?, ?, ?)').run(100, 1, '123')
+  }, /check constrain/i, 'url is invalid')
 
   t.end()
 })
