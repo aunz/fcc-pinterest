@@ -29,11 +29,11 @@ test('constrain', t => {
 
   t.throws(() => {
     db.prepare('insert into "user" (id, email) values (?, ?)').run(100, '   t@t  ')
-  }, /check constrain/i, 'email has to match email regexp')
+  }, /check constrain/i, 'email has to match email pattern')
 
   t.throws(() => {
     db.prepare('insert into "user" (id, email) values (?, ?)').run(100, '   t.t.com  ')
-  }, /check constrain/i, 'email has to match email regexp')
+  }, /check constrain/i, 'email has to match email pattern')
 
   t.throws(() => {
     db.prepare('insert into "user" (id, gh) values (?, ?)').run(100, 123)
