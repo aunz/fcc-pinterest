@@ -2,15 +2,35 @@ import { randomBytes, createHash } from 'crypto'
 import bcrypt from 'bcrypt'
 import db from './sqlite'
 
-export function createUser({ name, email, loc = '', pw }) {
+const userInfo = 'id, name, gh_name, gh, email'
+
+export function createUserWithEmail({ name, email, pw }) {
   return bcrypt.hash(pw, 10)
     .then(hash => {
-      return createEntity('user', { name, email, loc, pw: hash })
+      return createEntity('user', { name, email, pw: hash })
     })
 }
 
+export function createUserWithGH({ gh, gh_name }) {
+  return createEntity('user', { gh, gh_name })
+}
+
 export function getUserWithId(id) {
-  return db.prepare('select id, name, loc from "user" where id = ?').get(id)
+  return db.prepare(`select ${userInfo} from "user" where id = ?`).get(id)
+}
+
+export function getUserWithEmailPW(email, pw) {
+  const user = db.prepare('select * from "user" where email = ?').get(email)
+  if (!user) return Promise.resolve(null)
+  return bcrypt.compare(pw, user.pw).then(res => {
+    return res && randomBytes(21)
+  }).then(bytes => {
+    if (!bytes) return null
+    const token = bytes.toString('base64')
+    user.token = token
+    updateUser(user.id, { token })
+    return user
+  })
 }
 
 export function updateUser(id, object) {
@@ -42,7 +62,7 @@ export function getAndUpdateUserFromToken(token) { // like findAndModify from mo
 
   if (!token) return undefined
   token = createHash('md5').update(token).digest()
-  const user = db.prepare('select id, name, email, loc from "user" where token = ?').get(token)
+  const user = db.prepare(`select ${userInfo} from "user" where token = ?`).get(token)
   if (!user) return undefined
 
   const now = ~~(Date.now() / 1000)
@@ -61,6 +81,9 @@ export function deleteToken(token) {
   return db.prepare('update "user" set token = null, token_ts = null, token_ts_exp = null where token = ?').run(token).changes
 }
 
+export function createPin({ uid, title, url }) {
+  return createEntity('pin', { uid, title, url })
+}
 
 function createEntity(table, object) {
   // return id String, or throw error
