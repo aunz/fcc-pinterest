@@ -137,12 +137,15 @@ test('test pins', async t => {
   r = getPins(uids[0])
   t.ok(r.length === 4, 'can get pins by uid')
 
-  t.equal(delPin(r[0].id, 100), 0, 'cannot del pin with wrong uid')
-  t.ok(
-    delPin(r[0].id, r[0].uid) === 1 &&
-    delPin(r[1].id, r[1].uid) === 1 &&
-    delPin(r[2].id, r[2].uid) === 1,
-    'can del pins'
+  t.equal(
+    [
+      delPin(r[0].id, 100),
+      delPin(r[0].id, r[0].uid),
+      delPin(r[1].id, r[1].uid),
+      delPin(r[2].id, r[2].uid),
+    ].join(' '),
+    '0 1 1 1',
+    'can only del pins with correct uid'
   )
 
   r = getPins(uids[0])
