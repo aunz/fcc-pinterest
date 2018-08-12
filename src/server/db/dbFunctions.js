@@ -12,7 +12,8 @@ export function createUserWithEmail({ name, email, pw }) {
 }
 
 export function createUserWithGH({ gh, gh_name }) {
-  return createEntity('user', { gh, gh_name })
+  const id = db.prepare(`select id from "user" where gh = ?`).pluck().get(gh)
+  return id || createEntity('user', { gh, gh_name })
 }
 
 export function getUserWithId(id) {
