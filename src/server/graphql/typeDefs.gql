@@ -1,6 +1,31 @@
 type Query {
+  pins(uid: Int): [pins]!
 }
 
 type Mutation {
+  createUserWithEmail(name: String, email: String!, pw: String!): LoggedInUser
+  loginWithEmail(email: String!, pw: String!): LoggedInUser
+  loginWithGH(code: String!): LoggedInUser
+  logout(token: String!): Int
+  createPin(title: String, url: String!, token: String!): Int
+  delPin(id: Int!, token: String!): Int
+
+}
+
+type LoggedInUser {
+  id: Int!
+  name: String
+  email: String
+  gh: Int
+  gh_name: String
+  token: String
+}
+
+type pins {
+  id: Int!
+  ts: Int
+  uid: Int!
+  title: String
+  url: String!
 }
 
