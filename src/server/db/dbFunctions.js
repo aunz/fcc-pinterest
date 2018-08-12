@@ -75,7 +75,7 @@ export function getAndUpdateUserFromToken(token) { // like findAndModify from mo
   return user
 }
 
-export function deleteToken(token) {
+export function delToken(token) {
   if (!token) return undefined
   token = createHash('md5').update(token).digest()
   return db.prepare('update "user" set token = null, token_ts = null, token_ts_exp = null where token = ?').run(token).changes

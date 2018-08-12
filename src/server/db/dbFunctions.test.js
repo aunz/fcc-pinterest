@@ -8,7 +8,7 @@ import {
   getUserWithId,
   updateUser,
   getAndUpdateUserFromToken,
-  deleteToken,
+  delToken,
   createPin,
   getPins,
   delPin,
@@ -43,7 +43,7 @@ test('test users', s, async t => {
   r = db.prepare('select * from "user" where id = ?').get(r.id)
   t.ok(r.token_ts !== null && r.token_ts_exp === r.token_ts + 7776000, 'token_ts and exp are set')
 
-  t.equal(deleteToken('123'), 1, 'can delete token')
+  t.equal(delToken('123'), 1, 'can delete token')
   r = db.prepare('select * from "user" where id = ?').get(r.id)
   t.ok(r.token === null && r.token_ts === null && r.token_ts_exp === null, 'token and ts can be deleted')
 
