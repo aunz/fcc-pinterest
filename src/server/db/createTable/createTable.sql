@@ -7,7 +7,7 @@ create table "user" (
   gh_name text check (length(trim(gh_name)) > 2), -- github name
   pw text, -- password
   token blob, -- hashed token 256 bits for user authentication, astronomically rare to collide, no need unique constraint
-  token_ts int, -- ts when token is created
+  token_ts int, -- ts when token is created or updated
   token_ts_exp int -- ts when token SHOULD be expired
 );
 create unique index user_email on "user"(lower(email));
