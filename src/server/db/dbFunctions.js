@@ -85,6 +85,16 @@ export function createPin({ uid, title, url }) {
   return createEntity('pin', { uid, title, url })
 }
 
+export function getPins(uid) {
+  const where = 'where del is null' + (uid ? ' and uid = ?' : '')
+  const stmt = db.prepare(`select id, uid, ts, title, url from pin ${where} order by rowid desc`)
+  return uid ? stmt.all(uid) : stmt.all()
+}
+
+export function delPin(id) {
+  return db.prepare('update pin set del = ? where id = ?').run(~~(Date.now() / 1000), id).changes
+}
+
 function createEntity(table, object) {
   // return id String, or throw error
   const keys = Object.keys(object)

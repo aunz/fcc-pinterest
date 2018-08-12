@@ -18,5 +18,6 @@ create table pin (
   ts int not null default (strftime('%s','now')),
   uid int not null references "user" (id),
   title text, -- the title of the pin
-  url text not null check (url like '_%._%')
+  url text not null check (url like '_%._%'),
+  del int -- ts when pis is deleted
 );

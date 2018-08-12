@@ -10,7 +10,8 @@ import {
   getAndUpdateUserFromToken,
   deleteToken,
   createPin,
-
+  getPins,
+  delPin,
 } from './dbFunctions'
 
 const s = { skip: true } // eslint-disable-line
@@ -30,7 +31,7 @@ test('create users', async t => {
   t.end()
 })
 
-test('test users', async t => {
+test('test users', s, async t => {
   let r = db.prepare('select * from "user" order by rowid').all()
   t.ok(r[0].id > 10000 && r[1].id >= r[0].id + 10 && r[9].id >= r[8].id + 10 && r[9].id >= r[0].id + 90, `id starts with 10000 and jumps 10 each: ${r[0].id} ~ ${r[9].id}`)
 
@@ -117,6 +118,37 @@ test('test pins', async t => {
   t.throws(() => {
     db.prepare('delete from "user" where id = ?').run(uids[0])
   }, /FOREIGN KEY constraint/i, 'cannot delete uid due to foreign key constraint')
+
+  r = getPins()
+  t.ok(
+    r.length === 10 &&
+    r[0].id > r[1].id &&
+    r[1].id > r[2].id &&
+    r[2].id > r[8].id &&
+    r[8].id > r[9].id &&
+    Object.keys(r[0]).join(' ') === 'id uid ts title url',
+    'can retrieve pins'
+  )
+
+  createPin({ uid: uids[0], url: 'u1.com' })
+  createPin({ uid: uids[0], url: 'u2.com' })
+  createPin({ uid: uids[0], url: 'u3.com' })
+
+  r = getPins(uids[0])
+  t.ok(r.length === 4, 'can get pins by uid')
+  t.ok(
+    delPin(r[0].id) === 1 &&
+    delPin(r[1].id) === 1 &&
+    delPin(r[2].id) === 1,
+    'can del pins'
+  )
+
+  r = getPins(uids[0])
+  t.ok(r.length === 1 && r[0].title === 'title0', 'can gel pins, now user 0 has only 1 pin')
+
+  r = getPins()
+  t.ok(r.length === 10, 'can del pins, now there are back to 10 total pins')
+  // console.log(r)
 
   t.end()
 })
