@@ -1,5 +1,6 @@
 type Query {
   pins(uid: Int): [pins]!
+  GHclientId: String!
 }
 
 type Mutation {
