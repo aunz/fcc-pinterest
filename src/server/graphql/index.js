@@ -6,4 +6,12 @@ export default new ApolloServer({
   typeDefs,
   resolvers,
   context({ req, res }) { return { req, res } },
+  formatError(error) {
+    const { originalError } = error
+    if (originalError && originalError.name === 'SqliteError') {
+      error.message = 'Internal Server Error'
+    }
+    const { locations, path, ...newErr } = error
+    return newErr
+  },
 })
