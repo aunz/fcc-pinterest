@@ -84,8 +84,13 @@ test('create pins', async t => {
 test('pins', async t => {
   const u = (await graphql(schema, `mutation { loginWith(provider: email, email: "1@test.com", code: "123") ${f} }`)).data.loginWith
 
-  let r = await graphql(schema, `mutation { createPin(title: "t1", url: "url1com", token: "${u.token}") }`)
-  t.ok(/url/.test(r.errors[0].message), 'cannot create pin with an invalid url')
+  let r = await graphql(schema, `mutation {
+    p1: createPin(title: "t1", url: "url1com", token: "${u.token}")
+    p2: createPin(title: "t1", url: "http://url1com", token: "${u.token}")
+    p3: createPin(title: "t1", url: "http://url1com.", token: "${u.token}")
+    p4: createPin(title: "t1", url: "ftp://url1.com", token: "${u.token}")
+  }`)
+  t.ok(r.errors.every(el => /url/.test(el.message)), 'cannot create pin with an invalid url')
 
   r = await graphql(schema, `mutation { createPin(title: "t1", url: "url1.com", token: "123") }`)
   t.ok(/unauthori/i.test(r.errors[0].message), 'cannot create pin without a valid token')
