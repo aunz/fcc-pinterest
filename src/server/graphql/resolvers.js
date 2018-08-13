@@ -2,6 +2,7 @@ import { randomBytes } from 'crypto'
 
 import isEmail from 'validator/lib/isEmail'
 import normalizeEmail from 'validator/lib/normalizeEmail'
+import isURL from 'validator/lib/isURL'
 
 import {
   errInput,
@@ -64,7 +65,12 @@ export default {
       throw errInput('Provider is invalid')
     },
     logout(_, { token }) { return delToken(token) },
-    createPin(_, { title, url, token }) { return createPin({ uid: getUid(token), title, url }) },
+    createPin(_, { title, url, token }) {
+      url = url.trim()
+      if (!isURL(url, { protocols: ['http', 'https'] })) throw errInput('url is invalid')
+      const uid = getUid(token)
+      return createPin({ uid, title, url })
+    },
     delPin(_, { id, token }) { return delPin(id, getUid(token)) },
   },
 }
