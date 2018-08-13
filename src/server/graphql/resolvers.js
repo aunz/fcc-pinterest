@@ -42,6 +42,9 @@ export default {
           email,
           token,
         }
+      }).catch(e => {
+        if (/unique.*email/i.test(e.message)) throw errInput('Email has been registered')
+        throw e
       })
     },
     loginWith(_, { provider, email, code }) {
