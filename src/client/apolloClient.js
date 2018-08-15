@@ -26,7 +26,7 @@ const client = new ApolloClient({
     `,
     resolvers: {
       Query: {
-        localUser(_, { cache }) {
+        localUser(_, args, { cache }) {
           return get('localUser')
             .catch(() => null) // when idb is not supported
             .then(user => {
