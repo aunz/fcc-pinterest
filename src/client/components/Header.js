@@ -7,25 +7,17 @@ export default class Header extends PureComponent {
     loggedIn: PropTypes.bool
   }
   render() {
-    const { loggedIn } = this.props
-    const linkClass = 'white decoration-none m1 '
+    const linkClass = ' m1 text-decoration-none white '
     return (
-      <div className="flex h3 bg-color1 white justify-center">
+      <div className='flex h3 bg-color1 white justify-center'>
         <Link
-          to="/"
+          to='/'
           className={linkClass + 'icon-home'}
         />
         <Link
-          to={'/' + loggedIn ? 'user' : 'login'}
+          to='user'
           className={linkClass + 'icon-user'}
         />
-        {loggedIn && (
-          <Fragment>
-            <Link to="/addBook" className={linkClass + 'icon-plus'} />
-            <Link to="/myBook" className={linkClass + 'icon-book'} />
-            <Link to="/myRequest" className={linkClass + 'icon-comment'} />
-          </Fragment>
-        )}
       </div>
     )
   }
