@@ -4,12 +4,21 @@ import { Query } from 'react-apollo'
 
 import './styles/index.css'
 
+import { LOCAL_USER } from './apolloClient'
+
+import Header from './components/Header'
+
 class App extends Component {
-  constructor(props) {
-    super(props)
-  }
   render() {
-    return null
+    return (
+      <Query query={LOCAL_USER}>
+        {() => {
+          return <Fragment>
+            <Header />
+          </Fragment>
+        }}
+      </Query>
+    )
   }
 }
 
