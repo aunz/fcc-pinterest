@@ -1,5 +1,5 @@
 @import 'normalize.css/normalize.css';
-/*@import 'basscss/css/basscss.min.css';*/
+@import 'basscss/css/basscss.min.css';
 @import './fontello/css/fontello-embedded.css';
 @import './fontello/css/animation.css';
 @import './variables.css';
@@ -14,3 +14,7 @@ body {
   padding-bottom: 3rem;
 }
 
+
+.bg-color1 { background-color: var(--color1) }
+
+.white { color: white }
