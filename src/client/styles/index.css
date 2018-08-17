@@ -18,6 +18,7 @@ body {
 /* color */
 .white { color: white }
 .silver { color: #aaa }
+.red { color: #FF4136 }
 
 /* background  color */
 .bg-color1 { background-color: var(--color1) }
