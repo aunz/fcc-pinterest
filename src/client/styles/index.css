@@ -18,3 +18,5 @@ body {
 .bg-color1 { background-color: var(--color1) }
 
 .white { color: white }
+
+.pointer { cursor: pointer }
