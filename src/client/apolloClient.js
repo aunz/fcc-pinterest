@@ -47,7 +47,6 @@ const client = new ApolloClient({
                 return loginWith
               }).catch(() => {})
             })
-
         },
       },
       Mutation: {
@@ -68,6 +67,7 @@ const client = new ApolloClient({
             mutation: gql`${__LOG_IN} ${loggedInUser} }`,
             variables,
           }).then(({ user }) => {
+            if (!user) throw new Error('Unauthorized')
             cache.writeQuery({
               query: LOCAL_USER,
               data: { localUser: user }
