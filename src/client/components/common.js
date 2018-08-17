@@ -5,3 +5,5 @@ export function Loading(props) {
 }
 
 export const inputClass = ' p1 outline-none '
+
+export const buttonClass = inputClass + ' pointer button '
