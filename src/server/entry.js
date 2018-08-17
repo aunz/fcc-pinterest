@@ -2,7 +2,7 @@ import 'source-map-support/register'
 import 'dotenv/config'
 import express from 'express'
 import helmet from 'helmet'
-// import apolloServer from './graphql'
+import apolloServer from './graphql'
 
 const app = express()
 
@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === 'production') app.use(helmet())
 
 app.use(express.static('./dist/public'))
 
-// apolloServer.applyMiddleware({ app })
+apolloServer.applyMiddleware({ app })
 
 app.use((req, res, next) => {
   if (req.method === 'GET' && req.accepts('html')) {
