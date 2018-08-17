@@ -3,6 +3,7 @@
 @import './fontello/css/fontello-embedded.css';
 @import './fontello/css/animation.css';
 @import './variables.css';
+@import './shake.css';
 
 * {
   color: #333;
@@ -24,6 +25,7 @@ body {
 
 /* border */
 .border-silver { border-color: silver }
+.border-white { border-color: white }
 
 
 /* misc */
