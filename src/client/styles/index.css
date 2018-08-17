@@ -16,11 +16,30 @@ body {
 
 /* color */
 .white { color: white }
+.silver { color: #aaa }
 
 /* background  color */
 .bg-color1 { background-color: var(--color1) }
 
 
+/* border */
+.border-silver { border-color: silver }
+
 
 /* misc */
+.outline-none { outline: none }
 .pointer { cursor: pointer }
+
+
+/* component */
+.button {
+  background-color: transparent;
+  transition: all 0.3s ease;
+  &:disabled { cursor: not-allowed; opacity: 0.5; }
+  &:hover { opacity: 0.75 }
+  &:active {
+    opacity: 0.5;
+    background-color: #fffa;
+  }
+
+}
