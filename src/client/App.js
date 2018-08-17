@@ -19,9 +19,9 @@ class App extends Component {
           return <Fragment>
             <Header loggedIn={!!user} />
             <Switch>
-              <Route path='/user' render={() => <User user={user} />} />
+              <Route path="/user" render={() => <User user={user} />} />
             </Switch>
-            {loading && <div className='fixed h1' style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}><Loading /></div>}
+            {loading && <div className="fixed h1" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}><Loading /></div>}
           </Fragment>
         }}
       </Query>
