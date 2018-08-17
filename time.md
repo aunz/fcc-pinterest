@@ -21,3 +21,5 @@ finish resolver and tests
 starting client side, apolloclient, html, css
 20180816  2
 UI for login/signup
+20180817  2
+UI for login/signup continued
