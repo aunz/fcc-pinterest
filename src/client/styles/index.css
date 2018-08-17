@@ -14,9 +14,13 @@ body {
   padding-bottom: 3rem;
 }
 
-
-.bg-color1 { background-color: var(--color1) }
-
+/* color */
 .white { color: white }
 
+/* background  color */
+.bg-color1 { background-color: var(--color1) }
+
+
+
+/* misc */
 .pointer { cursor: pointer }
