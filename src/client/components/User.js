@@ -4,10 +4,13 @@ import { Mutation } from 'react-apollo'
 
 import isEmail from 'validator/lib/isEmail'
 
-// import {
-// } from '~/client/apolloClient'
+import {
+  LOG_IN
+} from '~/client/apolloClient'
 
 import {
+  Loading,
+  ErrorMessage,
 } from './common'
 
 export const userPropTypes = {
@@ -26,7 +29,7 @@ export default class User extends PureComponent {
   render() {
     const { user } = this.props
     return (
-      <div className="flex flex-column mx-auto" style={{ maxWidth: '40rem' }}>
+      <div className="flex flex-column mx-auto items-center" style={{ maxWidth: '40rem' }}>
         {user ? <Logout user={user} /> : <Fragment><Login /><Signup /></Fragment>}
       </div>
     )
@@ -35,22 +38,137 @@ export default class User extends PureComponent {
 
 class Login extends PureComponent {
   render() {
-    return <Fragment>
-      <h3 className="center">Login</h3>
+    return <Mutation mutation={LOG_IN}>
+      {(mutate, { loading }) => {
+        return <Fragment>
+          <LoginWithGH />
+          <span className="m2 center bold silver ">OR</span>
+          <LoginWithEmail mutate={mutate} loading={loading} />
+          <hr className="mt3" style={{ width: '100%' }} />
+        </Fragment>
+      }}
+    </Mutation>
+  }
+}
+
+class LoginWithGH extends PureComponent {
+  render() {
+    return (
       <a
-        className="flex self-center p1 border rounded items-center pointer text-decoration-none"
+        className="mt3 flex self-center p1 border border-silver rounded items-center pointer text-decoration-none"
         href="https://github.com/login/oauth/authorize?"
       >
         {Octocat} Login with GitHub
       </a>
-      <span className="silver">OR</span>
-    </Fragment>
+    )
   }
 }
+
+class LoginWithEmail extends PureComponent {
+  static propTypes = {
+    mutate: PropTypes.func.isRequired,
+    loading: PropTypes.bool.isRequired,
+  }
+  state = {
+    email: '1@test.com',
+    password: '123',
+    error: null,
+    errorMessage: '',
+  }
+  onInput = e => {
+    const { name, value } = e.currentTarget
+    this.setState({
+      [name]: value,
+      error: null,
+      errorMessage: '',
+    })
+  }
+  onSubmit = e => {
+    e.preventDefault()
+    const { email, password } = this.state
+    this.setState({ error: null, errorMessage: '' })
+    this.props.mutate({
+      variables: {
+        provider: 'email',
+        email,
+        code: password
+      }
+    }).catch(error => {
+      this.setState({ error })
+      if (/unauthorize/i.test(error.message)) this.setState({ errorMessage: 'Email or password incorrect' })
+    })
+  }
+  render() {
+    const r = '6px' // border radius
+    const minWidth = '16rem'
+    const { email, password, error, errorMessage } = this.state
+    const { loading } = this.props
+    const inputClass = require('./common').inputClass + ' border border-silver'
+    const buttonClass = require('./common').buttonClass + ' mt1 border '
+    return (
+      <form className="flex flex-column items-center" onSubmit={this.onSubmit}>
+        <input
+          className={inputClass}
+          style={{ minWidth, borderRadius: `${r} ${r} 0 0` }}
+          placeholder="email"
+          name="email"
+          onInput={this.onInput}
+        />
+        <input
+          className={inputClass}
+          style={{ minWidth, borderTop: 'none', borderRadius: `0 0 ${r} ${r}` }}
+          type="password"
+          placeholder="password"
+          name="password"
+          onInput={this.onInput}
+        />
+        {loading
+          ? <Loading className={buttonClass + ' border-white'} />
+          : <input
+            className={buttonClass + ' border-silver ' + (error ? 'shake' : '')}
+            type="submit"
+            disabled={error || password.trim().length < 3 || !isEmail(email)}
+            value="Login"
+          />
+        }
+        {errorMessage && <ErrorMessage error={errorMessage} />}
+      </form>
+    )
+  }
+}
+
 class Signup extends PureComponent {
   render() {
+    const inputClass = require('./common').inputClass + ' border border-silver'
+    const r = '6px' // border radius
+    const minWidth = '16rem'
     return <Fragment>
-      <h3 className="center">Sign up</h3>
+      <small className="silver italic">Don't have an account? </small>
+      <h3 className="mt1">Sign up</h3>
+      <input
+        className={inputClass}
+        style={{ minWidth, borderRadius: `${r} ${r} 0 0`, }}
+        placeholder="email"
+        type="email"
+        name="email"
+        onInput={this.onInput}
+      />
+      <input
+        className={inputClass}
+        style={{ minWidth, borderTop: 'none', borderRadius: 0 }}
+        type="password"
+        placeholder="password"
+        name="password1"
+        onInput={this.onInput}
+      />
+      <input
+        className={inputClass}
+        style={{ minWidth, borderTop: 'none', borderRadius: `0 0 ${r} ${r}`, }}
+        type="password"
+        placeholder="password"
+        name="password2"
+        onInput={this.onInput}
+      />
     </Fragment>
   }
 }
