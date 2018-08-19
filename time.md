@@ -23,3 +23,7 @@ starting client side, apolloclient, html, css
 UI for login/signup
 20180817  2
 UI for login/signup continued
+20180818  0.5
+UI for login/signup
+20180819  0.5
+UI for login/signup 
