@@ -5,7 +5,7 @@ import { Mutation } from 'react-apollo'
 import isEmail from 'validator/lib/isEmail'
 
 import {
-  LOG_IN
+  CREATE_USER, LOG_IN,
 } from '~/client/apolloClient'
 
 import {
@@ -64,6 +64,11 @@ class LoginWithGH extends PureComponent {
   }
 }
 
+const inputClass = require('./common').inputClass + ' border border-silver'
+const buttonClass = require('./common').buttonClass + ' mt1 border '
+const borderRadius = '6px'
+const minWidth = '16rem'
+
 class LoginWithEmail extends PureComponent {
   static propTypes = {
     mutate: PropTypes.func.isRequired,
@@ -99,24 +104,20 @@ class LoginWithEmail extends PureComponent {
     })
   }
   render() {
-    const r = '6px' // border radius
-    const minWidth = '16rem'
     const { email, password, error, errorMessage } = this.state
     const { loading } = this.props
-    const inputClass = require('./common').inputClass + ' border border-silver'
-    const buttonClass = require('./common').buttonClass + ' mt1 border '
     return (
       <form className="flex flex-column items-center" onSubmit={this.onSubmit}>
         <input
           className={inputClass}
-          style={{ minWidth, borderRadius: `${r} ${r} 0 0` }}
+          style={{ minWidth, borderRadius: `${borderRadius} ${borderRadius} 0 0` }}
           placeholder="email"
           name="email"
           onInput={this.onInput}
         />
         <input
           className={inputClass}
-          style={{ minWidth, borderTop: 'none', borderRadius: `0 0 ${r} ${r}` }}
+          style={{ minWidth, borderTop: 'none', borderRadius: `0 0 ${borderRadius} ${borderRadius}` }}
           type="password"
           placeholder="password"
           name="password"
@@ -139,15 +140,12 @@ class LoginWithEmail extends PureComponent {
 
 class Signup extends PureComponent {
   render() {
-    const inputClass = require('./common').inputClass + ' border border-silver'
-    const r = '6px' // border radius
-    const minWidth = '16rem'
-    return <Fragment>
+    return <form className="flex flex-column items-center" onSubmit={this.onSubmit}>
       <small className="silver italic">Don't have an account? </small>
       <h3 className="mt1">Sign up</h3>
       <input
         className={inputClass}
-        style={{ minWidth, borderRadius: `${r} ${r} 0 0`, }}
+        style={{ minWidth, borderRadius: `${borderRadius} ${borderRadius} 0 0`, }}
         placeholder="email"
         type="email"
         name="email"
@@ -163,13 +161,13 @@ class Signup extends PureComponent {
       />
       <input
         className={inputClass}
-        style={{ minWidth, borderTop: 'none', borderRadius: `0 0 ${r} ${r}`, }}
+        style={{ minWidth, borderTop: 'none', borderRadius: `0 0 ${borderRadius} ${borderRadius}`, }}
         type="password"
-        placeholder="password"
+        placeholder="re-enter password"
         name="password2"
         onInput={this.onInput}
       />
-    </Fragment>
+    </form>
   }
 }
 class Logout extends PureComponent {
