@@ -30,6 +30,7 @@ export function getUserWithEmailPW(email, pw) {
     updateUser(user.id, { token })
     return {
       id: user.id,
+      ts: user.ts,
       name: user.name,
       email: user.email,
       gh: user.gh,
