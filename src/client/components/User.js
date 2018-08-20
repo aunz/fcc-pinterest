@@ -74,8 +74,8 @@ class LoginWithEmail extends PureComponent {
     loading: PropTypes.bool.isRequired,
   }
   state = {
-    email: '1@test.com',
-    password: '123',
+    email: '',
+    password: '',
     error: null,
     errorMessage: '',
   }
@@ -142,9 +142,9 @@ class LoginWithEmail extends PureComponent {
 class Signup extends PureComponent {
   state = {
     name: '',
-    email: '1@test.com',
-    password1: '123',
-    password2: '123',
+    email: '',
+    password1: '',
+    password2: '',
     error: null,
     errorMessage: '',
   }
