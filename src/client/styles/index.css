@@ -40,7 +40,9 @@ body {
   background-color: transparent;
   transition: all 0.3s ease;
   &:disabled { cursor: not-allowed; opacity: 0.33; }
-  &:hover { opacity: 0.75 }
+  &:not(:disabled) {
+    &:hover { opacity: 0.75 }
+  }
   &:active {
     opacity: 0.5;
     background-color: #fffa;
