@@ -10,7 +10,7 @@ export const CREATE_USER = gql`${__CREATE_USER} @client }`
 const __LOG_IN = 'mutation loginWith($provider: provider!, $email: String!, $code: String!) { loginWith(provider: $provider, email: $email, code: $code) '
 export const LOG_IN = gql`${__LOG_IN} @client }`
 
-const __LOG_OUT = 'mutation logout ($token: String!) { logout(token: $token) '
+const __LOG_OUT = 'mutation logout($token: String!) { logout(token: $token) '
 export const LOG_OUT = gql`${__LOG_OUT} @client }`
 
 export const CREATE_PIN = gql`mutation createPin($title: String, $url: String!, $token: String!) { createPin(title: $title, url: $url, token: $token) }`
@@ -33,19 +33,19 @@ const client = new ApolloClient({
               if (!user) return null
               if (!user.token) return null
               return cache.__client.mutate({
-                mutation: gql`${__LOG_IN} ${loggedInUser}`,
+                mutation: gql`${__LOG_IN} ${loggedInUser} }`,
                 variables: {
                   provider: 'token',
                   email: '',
                   code: user.token,
                 }
-              }).then(({ loginWith }) => {
+              }).then(({ data: { loginWith } }) => {
                 if (!loginWith) {
                   del('localUser').catch(() => {})
                   return null
                 }
                 return loginWith
-              }).catch(() => {})
+              })
             })
         },
       },
@@ -54,25 +54,27 @@ const client = new ApolloClient({
           return cache.__client.mutate({
             mutation: gql`${__CREATE_USER} ${loggedInUser} }`,
             variables,
-          }).then(({ user }) => {
+          }).then(({ data: { createUserWithEmail: user } }) => {
             cache.writeQuery({
               query: LOCAL_USER,
               data: { localUser: user }
             })
-            return set('localUser', user).catch(() => null)
+            set('localUser', user).catch(() => null)
+            return user
           })
         },
         loginWith(_, variables, { cache }) {
           return cache.__client.mutate({
             mutation: gql`${__LOG_IN} ${loggedInUser} }`,
             variables,
-          }).then(({ user }) => {
+          }).then(({ data: { loginWith: user } }) => {
             if (!user) throw new Error('Unauthorized')
             cache.writeQuery({
               query: LOCAL_USER,
               data: { localUser: user }
             })
-            return set('localUser', user).catch(() => null)
+            set('localUser', user).catch(() => null)
+            return user
           })
         },
         logout(_, variables, { cache }) {
