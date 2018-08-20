@@ -29,7 +29,7 @@ export default class User extends PureComponent {
   render() {
     const { user } = this.props
     return (
-      <div className="flex flex-column mx-auto items-center" style={{ maxWidth: '40rem' }}>
+      <div className="flex flex-column mx-auto center" style={{ maxWidth: '20rem' }}>
         {user ? <Logout user={user} /> : <Fragment><Login /><Signup /></Fragment>}
       </div>
     )
@@ -42,7 +42,7 @@ class Login extends PureComponent {
       {(mutate, { loading }) => {
         return <Fragment>
           <LoginWithGH />
-          <span className="m2 center bold silver ">OR</span>
+          <span className="m2 bold silver ">OR</span>
           <LoginWithEmail mutate={mutate} loading={loading} />
           <hr className="mt3" style={{ width: '100%' }} />
         </Fragment>
@@ -55,7 +55,7 @@ class LoginWithGH extends PureComponent {
   render() {
     return (
       <a
-        className="mt3 flex self-center p1 border border-silver rounded items-center pointer text-decoration-none"
+        className="mt3 flex p1 border border-silver rounded items-center justify-center pointer text-decoration-none"
         href="https://github.com/login/oauth/authorize?"
       >
         {Octocat} Login with GitHub
@@ -67,7 +67,6 @@ class LoginWithGH extends PureComponent {
 const inputClass = require('./common').inputClass + ' border border-silver'
 const buttonClass = require('./common').buttonClass + ' mt1 border '
 const borderRadius = '6px'
-const minWidth = '16rem'
 
 class LoginWithEmail extends PureComponent {
   static propTypes = {
@@ -99,25 +98,27 @@ class LoginWithEmail extends PureComponent {
         code: password
       }
     }).catch(error => {
-      this.setState({ error })
-      if (/unauthorize/i.test(error.message)) this.setState({ errorMessage: 'Email or password incorrect' })
+      const errorMessage = /unauthorize/i.test(error.message)
+        ? 'Email or password incorrect'
+        : 'Something went wrong'
+      this.setState({ error, errorMessage })
     })
   }
   render() {
     const { email, password, error, errorMessage } = this.state
     const { loading } = this.props
     return (
-      <form className="flex flex-column items-center" onSubmit={this.onSubmit}>
+      <form className="flex flex-column " onSubmit={this.onSubmit}>
         <input
           className={inputClass}
-          style={{ minWidth, borderRadius: `${borderRadius} ${borderRadius} 0 0` }}
+          style={{ borderRadius: `${borderRadius} ${borderRadius} 0 0` }}
           placeholder="email"
           name="email"
           onInput={this.onInput}
         />
         <input
           className={inputClass}
-          style={{ minWidth, borderTop: 'none', borderRadius: `0 0 ${borderRadius} ${borderRadius}` }}
+          style={{ borderTop: 'none', borderRadius: `0 0 ${borderRadius} ${borderRadius}` }}
           type="password"
           placeholder="password"
           name="password"
@@ -139,13 +140,51 @@ class LoginWithEmail extends PureComponent {
 }
 
 class Signup extends PureComponent {
+  state = {
+    name: '',
+    email: '1@test.com',
+    password1: '123',
+    password2: '123',
+    error: null,
+    errorMessage: '',
+  }
+  onInput = e => {
+    const { name, value } = e.currentTarget
+    this.setState({
+      [name]: value,
+      error: null,
+      errorMessage: '',
+    })
+  }
+  onSubmit = e => {
+    e.preventDefault()
+    const { name, email, password1: pw } = this.state
+    this.mutate({
+      variables: { name, email, pw }
+    }).catch(error => {
+      const errorMessage = /register/i.test(error.message)
+        ? 'The email has been registered'
+        : 'Something went wrong'
+      this.setState({ error, errorMessage })
+    })
+  }
   render() {
-    return <form className="flex flex-column items-center" onSubmit={this.onSubmit}>
+    const { email, password1, password2, error, errorMessage } = this.state
+    const passwordMismatched = password1 !== password2 || password1.length < 3
+    return <form className="flex flex-column " onSubmit={this.onSubmit}>
       <small className="silver italic">Don't have an account? </small>
       <h3 className="mt1">Sign up</h3>
       <input
         className={inputClass}
-        style={{ minWidth, borderRadius: `${borderRadius} ${borderRadius} 0 0`, }}
+        style={{ borderRadius: `${borderRadius} ${borderRadius} 0 0`, }}
+        placeholder="name"
+        type="text"
+        name="name"
+        onInput={this.onInput}
+      />
+      <input
+        className={inputClass}
+        style={{ borderTop: 'none' }}
         placeholder="email"
         type="email"
         name="email"
@@ -153,7 +192,7 @@ class Signup extends PureComponent {
       />
       <input
         className={inputClass}
-        style={{ minWidth, borderTop: 'none', borderRadius: 0 }}
+        style={{ borderTop: 'none', borderRadius: 0 }}
         type="password"
         placeholder="password"
         name="password1"
@@ -161,15 +200,34 @@ class Signup extends PureComponent {
       />
       <input
         className={inputClass}
-        style={{ minWidth, borderTop: 'none', borderRadius: `0 0 ${borderRadius} ${borderRadius}`, }}
+        style={{ borderTop: 'none', borderRadius: `0 0 ${borderRadius} ${borderRadius}`, }}
         type="password"
         placeholder="re-enter password"
         name="password2"
         onInput={this.onInput}
       />
+      <Mutation
+        mutation={CREATE_USER}
+      >
+        {(mutate, { loading }) => {
+          if (loading) return <Loading className={buttonClass + ' border-white'} />
+          return <Fragment>
+            <input
+              className={buttonClass + ' border-silver ' + (error ? 'shake' : '')}
+              type="submit"
+              disabled={error || passwordMismatched || !isEmail(email)}
+              value="Sign up"
+              onClick={() => { this.mutate = mutate }} // pass the mutate to onSubmit
+            />
+            {errorMessage && <ErrorMessage error={errorMessage} />}
+          </Fragment>
+        }}
+      </Mutation>
+      {password2.length > 2 && passwordMismatched && <ErrorMessage error={'Passwords do not match'} />}
     </form>
   }
 }
+
 class Logout extends PureComponent {
   render() {
     return null
