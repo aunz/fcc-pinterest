@@ -27,3 +27,7 @@ UI for login/signup continued
 UI for login/signup
 20180819  0.5
 UI for login/signup 
+20180820  4
+UI for login/signup
+Fix resolver
+Logic for login with github
