@@ -3,7 +3,7 @@ create table "user" (
   ts int not null default (strftime('%s','now')), -- created date, timestamp in epoch
   "name" text,
   email text check (email like '_%@_%._%'),
-  gh int unique, -- github id, not login
+  gh text unique, -- github id, not login
   gh_name text check (length(trim(gh_name)) > 2), -- github name
   pw text, -- password
   token blob, -- hashed token 256 bits for user authentication, astronomically rare to collide, no need unique constraint

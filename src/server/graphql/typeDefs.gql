@@ -17,7 +17,7 @@ type LoggedInUser {
   ts: Int
   name: String
   email: String
-  gh: Int
+  gh: String
   gh_name: String
   token: String
 }
