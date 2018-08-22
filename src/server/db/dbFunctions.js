@@ -7,13 +7,13 @@ const userInfo = 'id, ts, name, gh_name, gh, email'
 export function createUserWithEmail({ name, email, pw }) {
   return bcrypt.hash(pw, 10)
     .then(hash => {
-      return createEntity('user', { name, email, pw: hash })
+      return createEntity('user', { name, email, pw: hash, })
     })
 }
 
 export function createUserWithGH({ gh, gh_name }) {
   const id = db.prepare(`select id from "user" where gh = ?`).pluck().get(gh)
-  return id || createEntity('user', { gh, gh_name })
+  return id || createEntity('user', { gh, gh_name, })
 }
 
 export function getUserWithId(id) {
@@ -41,9 +41,10 @@ export function updateUser(id, object) {
       object.token_ts = null
       object.token_ts_exp = null
     } else {
-      object.token = createHash('md5').update(object.token).digest() // token is stored as hash
-      object.token_ts = ~~(Date.now() / 1000)
-      if (!object.token_ts_exp) object.token_ts_exp = object.token_ts + 7776000 // 90 days from now
+      const digest = digestToken(object.token)
+      object.token = digest.token
+      object.token_ts = digest.token_ts
+      if (!object.token_ts_exp) object.token_ts_exp = digest.token_ts_exp
     }
   }
   const keys = Object.keys(object)
@@ -62,24 +63,23 @@ export function getAndUpdateUserFromToken(token) { // like findAndModify from mo
   // if found and ts conditions met, create new token_ts_exp and return the user
 
   if (!token) return undefined
-  token = createHash('md5').update(token).digest()
-  const user = db.prepare(`select ${userInfo} from "user" where token = ?`).get(token)
+  const digest = digestToken(token)
+  const user = db.prepare(`select ${userInfo}, token_ts, token_ts_exp from "user" where token = ?`).get(digest.token)
   if (!user) return undefined
 
-  const now = ~~(Date.now() / 1000)
-  if (user.token_ts_exp < now || user.token_ts + 31536000 < now) {
-    updateUser({ id: user.id, token: null })
+  if (user.token_ts_exp < digest.token_ts || user.token_ts + 31536000 < digest.token_ts) {
+    updateUser(user.id, { token: null })
     return undefined
   }
 
-  updateUser(user.id, { token_ts_exp: now + 7776000 }) // extend 90 more days
+  updateUser(user.id, { token_ts_exp: digest.token_ts_exp })
   return user
 }
 
 export function delToken(token) {
   if (!token) return undefined
-  token = createHash('md5').update(token).digest()
-  return db.prepare('update "user" set token = null, token_ts = null, token_ts_exp = null where token = ?').run(token).changes
+  const digest = digestToken(token)
+  return db.prepare('update "user" set token = null, token_ts = null, token_ts_exp = null where token = ?').run(digest.token).changes
 }
 
 export function createPin({ uid, title, url }) {
@@ -110,4 +110,13 @@ function createEntity(table, object) {
   `
   const { lastInsertROWID } = db.prepare(stmt).run(object)
   return db.prepare(`select id from "${table}" where rowid = ?`).pluck().get(lastInsertROWID)
+}
+
+function digestToken(token) {
+  const ts = ~~(Date.now() / 1000)
+  return {
+    token: createHash('md5').update(token).digest(), // token is stored as hash
+    token_ts: ts,
+    token_ts_exp: ts + 7776000, // extend 90 more days
+  }
 }
