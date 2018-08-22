@@ -40,7 +40,7 @@ const client = new ApolloClient({
                   code: user.token,
                 }
               }).then(({ data: { loginWith } }) => {
-                if (!loginWith) {
+                if (!loginWith || !loginWith.token) {
                   del('localUser').catch(() => {})
                   return null
                 }
