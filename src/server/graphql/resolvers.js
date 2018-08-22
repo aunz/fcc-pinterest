@@ -37,12 +37,7 @@ export default {
       return createUserWithEmail({ name, email: normalizeEmail(email), pw }).then(async id => {
         const token = (await randomBytes(21)).toString('base64') // a random token to be sent to client
         updateUser(id, { token })
-        return {
-          id,
-          name,
-          email,
-          token,
-        }
+        return { id, token }
       }).catch(e => {
         if (/unique.*email/i.test(e.message)) throw errInput('Email has been registered')
         throw e
@@ -54,13 +49,7 @@ export default {
         const id = createUserWithGH({ gh, gh_name })
         const token = (await randomBytes(21)).toString('base64') // a random token to be sent to client
         updateUser(id, { token })
-        return {
-          id,
-          ts: ~~(Date.now() / 1000),
-          gh,
-          gh_name,
-          token
-        }
+        return { id, gh, gh_name, token, }
       })
       if (provider === 'token') return getAndUpdateUserFromToken(code)
       throw errInput('Provider is invalid')
