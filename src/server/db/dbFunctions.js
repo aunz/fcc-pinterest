@@ -2,7 +2,7 @@ import { randomBytes, createHash } from 'crypto'
 import bcrypt from 'bcrypt'
 import db from './sqlite'
 
-const userInfo = 'id, name, gh_name, gh, email'
+const userInfo = 'id, ts, name, gh_name, gh, email'
 
 export function createUserWithEmail({ name, email, pw }) {
   return bcrypt.hash(pw, 10)
@@ -21,22 +21,16 @@ export function getUserWithId(id) {
 }
 
 export function getUserWithEmailPW(email, pw) {
-  const user = db.prepare('select * from "user" where email = ?').get(email)
+  const user = db.prepare(`select ${userInfo}, pw from "user" where email = ?`).get(email)
   if (!user) return Promise.resolve(null)
   return bcrypt.compare(pw, user.pw).then(async res => {
     if (!res) return null
     const bytes = await randomBytes(21)
     const token = bytes.toString('base64')
     updateUser(user.id, { token })
-    return {
-      id: user.id,
-      ts: user.ts,
-      name: user.name,
-      email: user.email,
-      gh: user.gh,
-      gh_name: user.gh_name,
-      token
-    }
+    user.pw = null
+    user.token = token
+    return user
   })
 }
 

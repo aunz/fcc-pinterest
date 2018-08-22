@@ -56,6 +56,7 @@ export default {
         updateUser(id, { token })
         return {
           id,
+          ts: ~~(Date.now() / 1000),
           gh,
           gh_name,
           token
