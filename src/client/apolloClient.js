@@ -22,8 +22,7 @@ const client = new ApolloClient({
   clientState: {
     defaults: {
     },
-    typeDefs: `
-    `,
+    typeDefs: ``,
     resolvers: {
       Query: {
         localUser(_, args, { cache }) {
@@ -38,12 +37,14 @@ const client = new ApolloClient({
                   provider: 'token',
                   email: '',
                   code: user.token,
-                }
+                },
+                fetchPolicy: 'no-cache',
               }).then(({ data: { loginWith } }) => {
-                if (!loginWith || !loginWith.token) {
+                if (!loginWith) {
                   del('localUser').catch(() => {})
                   return null
                 }
+                loginWith.token = user.token
                 return loginWith
               })
             })
@@ -54,7 +55,10 @@ const client = new ApolloClient({
           return cache.__client.mutate({
             mutation: gql`${__CREATE_USER} ${loggedInUser} }`,
             variables,
+            fetchPolicy: 'no-cache',
           }).then(({ data: { createUserWithEmail: user } }) => {
+            user.name = variables.name
+            user.email = variables.email
             cache.writeQuery({
               query: LOCAL_USER,
               data: { localUser: user }
@@ -67,6 +71,7 @@ const client = new ApolloClient({
           return cache.__client.mutate({
             mutation: gql`${__LOG_IN} ${loggedInUser} }`,
             variables,
+            fetchPolicy: 'no-cache',
           }).then(({ data: { loginWith: user } }) => {
             if (!user) throw new Error('Unauthorized')
             cache.writeQuery({

@@ -31,3 +31,7 @@ UI for login/signup
 UI for login/signup
 Fix resolver
 Logic for login with github
+20180821  1
+UI for github login
+20180822  3
+apollo client, fix resolver, continute with login with github logic
