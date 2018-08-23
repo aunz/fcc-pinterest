@@ -1,3 +1,5 @@
+import { parse, stringify } from 'querystring'
+
 import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { Query, Mutation } from 'react-apollo'
@@ -14,19 +16,17 @@ import {
   ErrorMessage,
 } from './common'
 
-export const userPropTypes = {
-  user: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string,
-    email: PropTypes.string,
-    gh: PropTypes.string,
-    gh_name: PropTypes.string,
-    token: PropTypes.string.isRequired,
-  })
-}
+export const userPropTypes = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  name: PropTypes.string,
+  email: PropTypes.string,
+  gh: PropTypes.string,
+  gh_name: PropTypes.string,
+  token: PropTypes.string.isRequired,
+})
 
 export default class User extends PureComponent {
-  static propTypes = userPropTypes
+  static propTypes = { user: userPropTypes }
   render() {
     const { user } = this.props
     return (
@@ -64,30 +64,36 @@ class LoginWithGH extends PureComponent {
       error: null,
       errorMessage: '',
     }
+
     // check the querystring for code and state which are returned from github
-    const { code, state, ...rest } = require('querystring').parse(window.location.search.slice(1))
+    const href = window.location.href.split('?')
+    const { code, state, ...restHref } = parse(href[1])
 
     // if both code and state are present, validate server side
     if (code && state) {
       this.state.attemptingToValidateGHCode = true
 
-      require('idb-keyval').get('csrfToken')
+      const { get, del } = require('idb-keyval')
+
+      get('csrfToken')
+        .catch(() => {})
         .then(token => {
-          console.log('the token', token, state, token == state)
           if (token !== state) return
           return this.props.mutate({
             mutation: LOG_IN,
-            variables: {
-              provider: 'gh',
-              email: '',
-              code
-            }
+            variables: { provider: 'gh', email: '', code }
           })
-        }, () => {})
+        })
         .catch(error => {
           this.unmounted || this.setState({ error })
         })
         .finally(() => {
+          // clean up the url, remove any querystring code or state returned by GitHub
+          const newQs = stringify(restHref) // new query string
+          const newUrl = href[0] + (newQs ? ('?' + newQs) : '')
+          window.history.replaceState(null, null, newUrl)
+          del('csrfToken').catch(() => {}) // then delete the token
+
           this.unmounted || this.setState({ attemptingToValidateGHCode: false })
         })
     }
@@ -97,7 +103,6 @@ class LoginWithGH extends PureComponent {
   }
   onClick = e => {
     e.preventDefault()
-    const { stringify } = require('querystring')
     const csrfToken = Array.from(window.crypto.getRandomValues(new Uint8Array(21)))
       .map(d => ('0' + d.toString(16)).slice(-2))
       .join('')
@@ -105,12 +110,11 @@ class LoginWithGH extends PureComponent {
       .set('csrfToken', csrfToken)
       .catch(() => {})
       .then(() => {
-        const href = 'https://github.com/login/oauth/authorize?' + stringify({
+        window.location.href = 'https://github.com/login/oauth/authorize?' + stringify({
           client_id: this.client_id,
           redirect_uri: window.location.origin + window.location.pathname,
           state: csrfToken,
         })
-        window.location.href = href
         // the redirect callback uri will be http://xxx?code=xxx&state=xxx
       })
   }
@@ -126,7 +130,7 @@ class LoginWithGH extends PureComponent {
             id="login" // this id is linked to integration test
             className={className}
             href="/"
-            rel="noopener nofollow"
+            rel="() => {}ener nofollow"
             onClick={this.onClick}
           >
             {Octocat} Login with GitHub
@@ -305,8 +309,12 @@ class Signup extends PureComponent {
 }
 
 class Logout extends PureComponent {
+  static propTypes = { user: userPropTypes }
   render() {
-    return null
+    const { name, gh_name } = this.props.user
+    return <Fragment>
+      <h3>Hello, <i>{name || gh_name || 'Anonymous'}</i>!</h3>
+    </Fragment>
   }
 }
 
