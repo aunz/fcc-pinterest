@@ -1,21 +1,17 @@
-import React, { PureComponent, Fragment } from 'react'
-import PropTypes from 'prop-types'
+import React, { PureComponent } from 'react'
 import { Link } from 'react-router-dom'
 
 export default class Header extends PureComponent {
-  static propTypes = {
-    loggedIn: PropTypes.bool
-  }
   render() {
-    const linkClass = ' m1 text-decoration-none white '
+    const linkClass = ' m1 text-decoration-none white outline-none '
     return (
-      <div className='flex h3 bg-color1 white justify-center'>
+      <div className="flex h3 bg-color1 white justify-center">
         <Link
-          to='/'
+          to="/"
           className={linkClass + 'icon-home'}
         />
         <Link
-          to='user'
+          to="user"
           className={linkClass + 'icon-user'}
         />
       </div>
