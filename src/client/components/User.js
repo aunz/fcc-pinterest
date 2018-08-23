@@ -1,11 +1,12 @@
 import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { Mutation } from 'react-apollo'
+import { Query, Mutation } from 'react-apollo'
 
 import isEmail from 'validator/lib/isEmail'
 
 import {
   CREATE_USER, LOG_IN,
+  GH_CLIENT_ID,
 } from '~/client/apolloClient'
 
 import {
@@ -18,7 +19,7 @@ export const userPropTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string,
     email: PropTypes.string,
-    gh: PropTypes.number,
+    gh: PropTypes.string,
     gh_name: PropTypes.string,
     token: PropTypes.string.isRequired,
   })
@@ -41,7 +42,7 @@ class Login extends PureComponent {
     return <Mutation mutation={LOG_IN}>
       {(mutate, { loading }) => {
         return <Fragment>
-          <LoginWithGH />
+          <LoginWithGH mutate={mutate} loading={loading} />
           <span className="m2 bold silver ">OR</span>
           <LoginWithEmail mutate={mutate} loading={loading} />
           <hr className="mt3" style={{ width: '100%' }} />
@@ -52,15 +53,87 @@ class Login extends PureComponent {
 }
 
 class LoginWithGH extends PureComponent {
+  static propTypes = {
+    mutate: PropTypes.func.isRequired,
+    loading: PropTypes.bool,
+  }
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      error: null,
+      errorMessage: '',
+    }
+    // check the querystring for code and state which are returned from github
+    const { code, state, ...rest } = require('querystring').parse(window.location.search.slice(1))
+
+    // if both code and state are present, validate server side
+    if (code && state) {
+      this.state.attemptingToValidateGHCode = true
+
+      require('idb-keyval').get('csrfToken')
+        .then(token => {
+          console.log('the token', token, state, token == state)
+          if (token !== state) return
+          return this.props.mutate({
+            mutation: LOG_IN,
+            variables: {
+              provider: 'gh',
+              email: '',
+              code
+            }
+          })
+        }, () => {})
+        .catch(error => {
+          this.unmounted || this.setState({ error })
+        })
+        .finally(() => {
+          this.unmounted || this.setState({ attemptingToValidateGHCode: false })
+        })
+    }
+  }
+  componentWillUnmount() {
+    this.unmounted = true
+  }
+  onClick = e => {
+    e.preventDefault()
+    const { stringify } = require('querystring')
+    const csrfToken = Array.from(window.crypto.getRandomValues(new Uint8Array(21)))
+      .map(d => ('0' + d.toString(16)).slice(-2))
+      .join('')
+    require('idb-keyval')
+      .set('csrfToken', csrfToken)
+      .catch(() => {})
+      .then(() => {
+        const href = 'https://github.com/login/oauth/authorize?' + stringify({
+          client_id: this.client_id,
+          redirect_uri: window.location.origin + window.location.pathname,
+          state: csrfToken,
+        })
+        window.location.href = href
+        // the redirect callback uri will be http://xxx?code=xxx&state=xxx
+      })
+  }
   render() {
-    return (
-      <a
-        className="mt3 flex p1 border border-silver rounded items-center justify-center pointer text-decoration-none"
-        href="https://github.com/login/oauth/authorize?"
-      >
-        {Octocat} Login with GitHub
-      </a>
-    )
+    const className = 'mt3 flex p1 border border-silver rounded items-center justify-center pointer text-decoration-none'
+    if (this.state.attemptingToValidateGHCode || this.props.loading) return <div className={className}><Loading className="mr1" />Logging in...</div>
+    return <Query query={GH_CLIENT_ID}>
+      {({ data, error }) => {
+        if (!data || !data.GHclientId || error) return null
+        this.client_id = data.GHclientId
+        return (
+          <a
+            id="login" // this id is linked to integration test
+            className={className}
+            href="/"
+            rel="noopener nofollow"
+            onClick={this.onClick}
+          >
+            {Octocat} Login with GitHub
+          </a>
+        )
+      }}
+    </Query>
   }
 }
 
@@ -79,6 +152,7 @@ class LoginWithEmail extends PureComponent {
     error: null,
     errorMessage: '',
   }
+  componentWillUnmount() { this.unmounted = true }
   onInput = e => {
     const { name, value } = e.currentTarget
     this.setState({
@@ -98,6 +172,7 @@ class LoginWithEmail extends PureComponent {
         code: password
       }
     }).catch(error => {
+      if (this.unmounted) return
       const errorMessage = /unauthorize/i.test(error.message)
         ? 'Email or password incorrect'
         : 'Something went wrong'
@@ -106,7 +181,6 @@ class LoginWithEmail extends PureComponent {
   }
   render() {
     const { email, password, error, errorMessage } = this.state
-    const { loading } = this.props
     return (
       <form className="flex flex-column " onSubmit={this.onSubmit}>
         <input
@@ -124,7 +198,7 @@ class LoginWithEmail extends PureComponent {
           name="password"
           onInput={this.onInput}
         />
-        {loading
+        {this.props.loading
           ? <Loading className={buttonClass + ' border-white'} />
           : <input
             className={buttonClass + ' border-silver ' + (error ? 'shake' : '')}
@@ -148,6 +222,7 @@ class Signup extends PureComponent {
     error: null,
     errorMessage: '',
   }
+  componentWillUnmount() { this.unmounted = true }
   onInput = e => {
     const { name, value } = e.currentTarget
     this.setState({
@@ -162,6 +237,7 @@ class Signup extends PureComponent {
     this.mutate({
       variables: { name, email, pw }
     }).catch(error => {
+      if (this.unmounted) return
       const errorMessage = /register/i.test(error.message)
         ? 'The email has been registered'
         : 'Something went wrong'
