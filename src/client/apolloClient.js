@@ -10,8 +10,7 @@ export const CREATE_USER = gql`${__CREATE_USER} @client }`
 const __LOG_IN = 'mutation loginWith($provider: provider!, $email: String!, $code: String!) { loginWith(provider: $provider, email: $email, code: $code) '
 export const LOG_IN = gql`${__LOG_IN} @client }`
 
-const __LOG_OUT = 'mutation logout($token: String!) { logout(token: $token) '
-export const LOG_OUT = gql`${__LOG_OUT} @client }`
+export const LOG_OUT = gql`mutation { logout @client }`
 
 export const CREATE_PIN = gql`mutation createPin($title: String, $url: String!, $token: String!) { createPin(title: $title, url: $url, token: $token) }`
 export const DEL_PIN = gql`mutation delPin($id: Int!, $token: String!) { delPin(id: $id, token: $token) }`
@@ -85,8 +84,10 @@ const client = new ApolloClient({
         logout(_, variables, { cache }) {
           del('localUser').catch(() => {})
           cache.__client.mutate({
-            mutation: gql`${__LOG_OUT} }`,
-            variables,
+            mutation: gql`mutation logout($token: String!) { logout(token: $token) }`,
+            variables: {
+              token: cache.readQuery({ query: LOCAL_USER }).localUser.token
+            },
           })
           setTimeout(window.location.reload.bind(window.location), 99)
         }
@@ -98,6 +99,6 @@ const client = new ApolloClient({
     }
   },
 })
-client.cache.__client = client // so can access client within cache
+client.cache.__client = client // a hack so it is possible to access client within cache
 
 export default client
