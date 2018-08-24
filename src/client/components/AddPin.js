@@ -22,8 +22,9 @@ const minWidth = '20rem'
 export default class AddPin extends PureComponent {
   static propTypes = { token: PropTypes.string.isRequired }
   state = {
-    title: '',
     url: '', // http://127.0.0.1:3000/tmp/1.jpg
+    title: '',
+    description: '',
     imageError: false,
   }
   componentWillUnmount() { this.unmounted = true }
@@ -43,7 +44,7 @@ export default class AddPin extends PureComponent {
     })
   }
   render() {
-    const { title, url, imageError, submitted } = this.state
+    const { url, title, description, imageError, submitted } = this.state
     if (submitted) return <Redirect to="/" />
     return <div className="flex flex-column items-center">
       <h3>Add a pin</h3>
@@ -57,8 +58,15 @@ export default class AddPin extends PureComponent {
       <input
         className={inputClass}
         placeholder="title (optional)"
-        style={{ minWidth, borderTop: 'none' }}
+        style={{ minWidth, borderTop: 'none', }}
         name="title"
+        onChange={this.onChange}
+      />
+      <input
+        className={inputClass}
+        placeholder="desription (optional)"
+        style={{ minWidth, borderTop: 'none' }}
+        name="desription"
         onChange={this.onChange}
       />
       <div className="my2 p1 flex flex-column items-center" style={{ maxWidth: '100vw' }} >
@@ -80,7 +88,7 @@ export default class AddPin extends PureComponent {
               disabled={imageError || !url || error}
               onClick={() => {
                 mutate({
-                  variables: { title, url, token: this.props.token },
+                  variables: { url, title, description, token: this.props.token },
                   fetchPolicy: 'no-cache'
                 }).then(() => {
                   this.unmounted || this.setState({ submitted: true })

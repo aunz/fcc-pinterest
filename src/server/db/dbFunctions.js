@@ -82,8 +82,15 @@ export function delToken(token) {
   return db.prepare('update "user" set token = null, token_ts = null, token_ts_exp = null where token = ?').run(digest.token).changes
 }
 
-export function createPin({ uid, title, url }) {
-  return createEntity('pin', { uid, title, url })
+export function createPin({ uid, url, title, description }) {
+  if (title) title = title.trim()
+  if (description) description = description.trim()
+  return createEntity('pin', {
+    uid,
+    url,
+    title,
+    description
+  })
 }
 
 export function getPins(uid) {

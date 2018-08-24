@@ -12,9 +12,9 @@ export const LOG_IN = gql`${__LOG_IN} @client }`
 
 export const LOG_OUT = gql`mutation { logout @client }`
 
-export const CREATE_PIN = gql`mutation createPin($title: String, $url: String!, $token: String!) { createPin(title: $title, url: $url, token: $token) }`
+export const CREATE_PIN = gql`mutation createPin($url: String!, $token: String!, $title: String, $description: String) { createPin(url: $url, token: $token, title: $title, description: $description) }`
 export const DEL_PIN = gql`mutation delPin($id: Int!, $token: String!) { delPin(id: $id, token: $token) }`
-export const PINS = gql`query pins($uid: Int) { pins(uid: $uid) { id ts uid title url } }`
+export const PINS = gql`query pins($uid: Int) { pins(uid: $uid) { id ts uid url title description } }`
 export const GH_CLIENT_ID = gql`query { GHclientId }`
 
 const client = new ApolloClient({

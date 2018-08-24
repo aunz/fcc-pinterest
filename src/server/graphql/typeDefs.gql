@@ -7,7 +7,7 @@ type Mutation {
   createUserWithEmail(name: String, email: String!, pw: String!): LoggedInUser
   loginWith(provider: provider!, email: String!, code: String!): LoggedInUser
   logout(token: String!): Int
-  createPin(title: String, url: String!, token: String!): Int
+  createPin(url: String!, token: String!, title: String, description: String): Int
   delPin(id: Int!, token: String!): Int
 
 }
@@ -26,8 +26,9 @@ type pins {
   id: Int!
   ts: Int
   uid: Int!
-  title: String
   url: String!
+  title: String
+  description: String
 }
 
 enum provider {

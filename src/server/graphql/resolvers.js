@@ -55,11 +55,11 @@ export default {
       throw errInput('Provider is invalid')
     },
     logout(_, { token }) { return delToken(token) },
-    createPin(_, { title, url, token }) {
+    createPin(_, { url, token, title, description }) {
       url = url.trim()
       if (!isURL(url, { protocols: ['http', 'https'] })) throw errInput('url is invalid')
       const uid = getUid(token)
-      return createPin({ uid, title, url })
+      return createPin({ uid, url, title, description })
     },
     delPin(_, { id, token }) { return delPin(id, getUid(token)) },
   },
