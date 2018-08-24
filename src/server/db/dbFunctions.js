@@ -6,9 +6,11 @@ const userInfo = 'id, ts, name, gh_name, gh, email'
 
 export function createUserWithEmail({ name, email, pw }) {
   return bcrypt.hash(pw, 10)
-    .then(hash => {
-      return createEntity('user', { name, email, pw: hash, })
-    })
+    .then(hash => createEntity('user', {
+      name: (name && name.trim()) || null,
+      email,
+      pw: hash,
+    }))
 }
 
 export function createUserWithGH({ gh, gh_name }) {
@@ -83,13 +85,11 @@ export function delToken(token) {
 }
 
 export function createPin({ uid, url, title, description }) {
-  if (title) title = title.trim()
-  if (description) description = description.trim()
   return createEntity('pin', {
     uid,
     url,
-    title,
-    description
+    title: (title && title.trim()) || null,
+    description: (description && description.trim()) || null,
   })
 }
 
