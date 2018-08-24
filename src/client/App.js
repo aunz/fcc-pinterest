@@ -24,7 +24,7 @@ class App extends Component {
             <Header loggedIn={loggedIn} />
             <Switch>
               <Route path="/user" render={() => loading ? LoadingDiv : <User loggedIn={loggedIn} />} />
-              {loggedIn && <Route path="/addPin" render={() => <AddPin user={user} />} />}
+              {loggedIn && <Route path="/addPin" render={() => <AddPin token={user.token} />} />}
             </Switch>
           </Fragment>
         }}
