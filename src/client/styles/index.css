@@ -26,9 +26,9 @@ body {
 
 
 /* border */
+.border-color1d { border-color: var(--color1-d) }
 .border-silver { border-color: silver }
 .border-white { border-color: white }
-
 
 /* misc */
 .outline-none { outline: none }
