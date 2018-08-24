@@ -33,7 +33,7 @@ body {
 /* misc */
 .outline-none { outline: none }
 .pointer { cursor: pointer }
-
+.rounded1 { border-radius: 0.5rem }
 
 /* component */
 .button {
