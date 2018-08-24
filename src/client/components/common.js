@@ -37,7 +37,7 @@ export class ErrorMessage extends PureComponent {
 }
 
 export const inputClassBase = ' p1 outline-none  '
-export const inputClass = inputClassBase + ' border border-silver '
+export const inputClass = inputClassBase + ' border not-rounded border-silver '
 
 export const buttonClassBase = inputClassBase + ' pointer button '
 export const buttonClass = buttonClassBase + ' border '
