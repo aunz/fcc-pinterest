@@ -59,16 +59,16 @@ export default class AddPin extends PureComponent {
         name="title"
         onChange={this.onChange}
       />
-      {url && (
-        <div className="my2 p1 flex flex-column items-center" style={{ maxWidth: '100vw' }} >
+      <div className="my2 p1 flex flex-column items-center" style={{ maxWidth: '100vw' }} >
+        {url && <Fragment>
           <img
             src={url}
             style={{ maxWidth: '100%' }}
             onError={this.onError}
           />
           <i className="mt1">{title}</i>
-        </div>
-      )}
+        </Fragment>}
+      </div>
       <Mutation mutation={CREATE_PIN} key={url}>
         {(mutate, { loading, error }) => {
           if (loading) return <Loading className={buttonClassBase} />
