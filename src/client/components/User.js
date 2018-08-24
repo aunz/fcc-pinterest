@@ -7,7 +7,8 @@ import { Query, Mutation } from 'react-apollo'
 import isEmail from 'validator/lib/isEmail'
 
 import {
-  CREATE_USER, LOG_IN,
+  CREATE_USER,
+  LOG_IN, LOG_OUT,
   GH_CLIENT_ID,
 } from '~/client/apolloClient'
 
@@ -286,9 +287,7 @@ class Signup extends PureComponent {
         name="password2"
         onInput={this.onInput}
       />
-      <Mutation
-        mutation={CREATE_USER}
-      >
+      <Mutation mutation={CREATE_USER}>
         {(mutate, { loading }) => {
           if (loading) return <Loading className={buttonClass + ' border-white'} />
           return <Fragment>
@@ -314,6 +313,16 @@ class Logout extends PureComponent {
     const { name, gh_name } = this.props.user
     return <Fragment>
       <h3>Hello, <i>{name || gh_name || 'Anonymous'}</i>!</h3>
+      <Mutation mutation={LOG_OUT}>
+        {mutate => (
+          <input
+            className={buttonClass}
+            type="submit"
+            value="Log out"
+            onClick={() => { mutate() }}
+          />
+        )}
+      </Mutation>
     </Fragment>
   }
 }
