@@ -5,6 +5,8 @@ export function Loading(props) {
   return <span {...props} className={'icon-spin6 animate-spin ' + (props.className || '')} />
 }
 
+export const LoadingFull = <div className="fixed h1" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}><Loading /></div>
+
 export class ErrorMessage extends PureComponent {
   static propTypes = {
     error: PropTypes.string

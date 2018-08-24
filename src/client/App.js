@@ -7,11 +7,10 @@ import './styles/index.css'
 import { LOCAL_USER } from './apolloClient'
 
 import Header from './components/Header'
+import Home from './components/Home'
 import User from './components/User'
 import AddPin from './components/AddPin'
-import { Loading } from './components/common'
-
-const LoadingDiv = <div className="fixed h1" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}><Loading /></div>
+import { LoadingFull } from './components/common'
 
 class App extends Component {
   render() {
@@ -23,7 +22,8 @@ class App extends Component {
           return <Fragment>
             <Header loggedIn={loggedIn} />
             <Switch>
-              <Route path="/user" render={() => loading ? LoadingDiv : <User loggedIn={loggedIn} />} />
+              <Route exact path="/" render={() => <Home />} />
+              <Route path="/user" render={() => loading ? LoadingFull : <User loggedIn={loggedIn} />} />
               {loggedIn && <Route path="/addPin" render={() => <AddPin token={user.token} />} />}
             </Switch>
           </Fragment>
