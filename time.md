@@ -35,3 +35,5 @@ Logic for login with github
 UI for github login
 20180822  3
 apollo client, fix resolver, continute with login with github logic
+20180823  3
+login components
