@@ -15,6 +15,9 @@ import {
 import {
   Loading,
   ErrorMessage,
+  borderRadius,
+  inputClass,
+  buttonClass,
 } from './common'
 
 export const userPropTypes = PropTypes.shape({
@@ -120,7 +123,6 @@ class LoginWithGH extends PureComponent {
       })
   }
   render() {
-    const className = 'mt3 flex p1 border border-silver rounded items-center justify-center pointer text-decoration-none'
     if (this.state.attemptingToValidateGHCode || this.props.loading) return <div className={className}><Loading className="mr1" />Logging in...</div>
     return <Query query={GH_CLIENT_ID}>
       {({ data, error }) => {
@@ -129,7 +131,7 @@ class LoginWithGH extends PureComponent {
         return (
           <a
             id="login" // this id is linked to integration test
-            className={className}
+            className={buttonClass + ' mt3 flex rounded text-decoration-none items-center justify-center'}
             href="/"
             rel="() => {}ener nofollow"
             onClick={this.onClick}
@@ -141,10 +143,6 @@ class LoginWithGH extends PureComponent {
     </Query>
   }
 }
-
-const inputClass = require('./common').inputClass + ' border border-silver'
-const buttonClass = require('./common').buttonClass + ' mt1 border '
-const borderRadius = '6px'
 
 class LoginWithEmail extends PureComponent {
   static propTypes = {
@@ -196,7 +194,7 @@ class LoginWithEmail extends PureComponent {
           onInput={this.onInput}
         />
         <input
-          className={inputClass}
+          className={inputClass + ' mb2'}
           style={{ borderTop: 'none', borderRadius: `0 0 ${borderRadius} ${borderRadius}` }}
           type="password"
           placeholder="password"
@@ -204,9 +202,9 @@ class LoginWithEmail extends PureComponent {
           onInput={this.onInput}
         />
         {this.props.loading
-          ? <Loading className={buttonClass + ' border-white'} />
+          ? <Loading className={buttonClass + ' border border-white'} />
           : <input
-            className={buttonClass + ' border-silver ' + (error ? 'shake' : '')}
+            className={buttonClass + ' border border-silver ' + (error ? 'shake' : '')}
             type="submit"
             disabled={error || password.trim().length < 3 || !isEmail(email)}
             value="Login"
@@ -280,7 +278,7 @@ class Signup extends PureComponent {
         onInput={this.onInput}
       />
       <input
-        className={inputClass}
+        className={inputClass + ' mb2'}
         style={{ borderTop: 'none', borderRadius: `0 0 ${borderRadius} ${borderRadius}`, }}
         type="password"
         placeholder="re-enter password"
@@ -316,7 +314,7 @@ class Logout extends PureComponent {
       <Mutation mutation={LOG_OUT}>
         {mutate => (
           <input
-            className={buttonClass}
+            className={buttonClass + ' border-silver'}
             type="submit"
             value="Log out"
             onClick={() => { mutate() }}

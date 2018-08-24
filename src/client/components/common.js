@@ -36,6 +36,10 @@ export class ErrorMessage extends PureComponent {
   }
 }
 
-export const inputClass = ' p1 outline-none '
+export const inputClassBase = ' p1 outline-none  '
+export const inputClass = inputClassBase + ' border border-silver '
 
-export const buttonClass = inputClass + ' pointer button '
+export const buttonClassBase = inputClassBase + ' pointer button '
+export const buttonClass = buttonClassBase + ' border '
+
+export const borderRadius = '6px'
