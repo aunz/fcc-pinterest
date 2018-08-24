@@ -7,6 +7,7 @@ import { Query, Mutation } from 'react-apollo'
 import isEmail from 'validator/lib/isEmail'
 
 import {
+  LOCAL_USER,
   CREATE_USER,
   LOG_IN, LOG_OUT,
   GH_CLIENT_ID,
@@ -20,22 +21,12 @@ import {
   buttonClass,
 } from './common'
 
-export const userPropTypes = PropTypes.shape({
-  id: PropTypes.number.isRequired,
-  name: PropTypes.string,
-  email: PropTypes.string,
-  gh: PropTypes.string,
-  gh_name: PropTypes.string,
-  token: PropTypes.string.isRequired,
-})
-
 export default class User extends PureComponent {
-  static propTypes = { user: userPropTypes }
+  static propTypes = { loggedIn: PropTypes.bool.isRequired }
   render() {
-    const { user } = this.props
     return (
       <div className="flex flex-column mx-auto center" style={{ maxWidth: '20rem' }}>
-        {user ? <Logout user={user} /> : <Fragment><Login /><Signup /></Fragment>}
+        {this.props.loggedIn ? <Logout /> : <Fragment><Login /><Signup /></Fragment>}
       </div>
     )
   }
@@ -123,6 +114,7 @@ class LoginWithGH extends PureComponent {
       })
   }
   render() {
+    const className = buttonClass + ' mt3 flex rounded text-decoration-none items-center justify-center'
     if (this.state.attemptingToValidateGHCode || this.props.loading) return <div className={className}><Loading className="mr1" />Logging in...</div>
     return <Query query={GH_CLIENT_ID}>
       {({ data, error }) => {
@@ -131,7 +123,7 @@ class LoginWithGH extends PureComponent {
         return (
           <a
             id="login" // this id is linked to integration test
-            className={buttonClass + ' mt3 flex rounded text-decoration-none items-center justify-center'}
+            className={className}
             href="/"
             rel="() => {}ener nofollow"
             onClick={this.onClick}
@@ -306,11 +298,15 @@ class Signup extends PureComponent {
 }
 
 class Logout extends PureComponent {
-  static propTypes = { user: userPropTypes }
   render() {
-    const { name, gh_name } = this.props.user
     return <Fragment>
-      <h3>Hello, <i>{name || gh_name || 'Anonymous'}</i>!</h3>
+      <Query query={LOCAL_USER}>
+        {({ data: { localUser } }) => {
+          return (
+            <h3>Hello, <i>{localUser.name || localUser.gh_name || 'Anonymous'}</i>!</h3>
+          )
+        }}
+      </Query>
       <Mutation mutation={LOG_OUT}>
         {mutate => (
           <input
