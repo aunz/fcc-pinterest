@@ -26,6 +26,7 @@ export default class AddPin extends PureComponent {
     url: '', // http://127.0.0.1:3000/tmp/1.jpg
     imageError: false,
   }
+  componentWillUnmount() { this.unmounted = true }
   onChange = e => {
     const { name, value } = e.currentTarget
     let { imageError } = this.state
@@ -42,7 +43,8 @@ export default class AddPin extends PureComponent {
     })
   }
   render() {
-    const { title, url, imageError } = this.state
+    const { title, url, imageError, submitted } = this.state
+    if (submitted) return <Redirect to="/" />
     return <div className="flex flex-column items-center">
       <h3>Add a pin</h3>
       <input
@@ -80,6 +82,8 @@ export default class AddPin extends PureComponent {
                 mutate({
                   variables: { title, url, token: this.props.token },
                   fetchPolicy: 'no-cache'
+                }).then(() => {
+                  this.unmounted || this.setState({ submitted: true })
                 })
               }}
             >
