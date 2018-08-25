@@ -37,3 +37,5 @@ UI for github login
 apollo client, fix resolver, continute with login with github logic
 20180823  3
 login components
+20180824  4
+UI for home, pins, resolver
