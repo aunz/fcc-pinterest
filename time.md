@@ -39,3 +39,5 @@ apollo client, fix resolver, continute with login with github logic
 login components
 20180824  4
 UI for home, pins, resolver
+20180825  1
+read about css mansory 
