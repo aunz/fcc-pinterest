@@ -41,3 +41,5 @@ login components
 UI for home, pins, resolver
 20180825  1
 read about css mansory 
+20180826  0.5
+reading on mansory
