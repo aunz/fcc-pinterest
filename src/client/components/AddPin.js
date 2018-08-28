@@ -7,6 +7,8 @@ import isURL from 'validator/lib/isURL'
 
 import {
   CREATE_PIN,
+  PINS,
+  LOCAL_USER,
 } from '~/client/apolloClient'
 
 import {
@@ -20,7 +22,6 @@ import {
 const minWidth = '20rem'
 
 export default class AddPin extends PureComponent {
-  static propTypes = { token: PropTypes.string.isRequired }
   state = {
     url: '', // http://127.0.0.1:3000/tmp/1.jpg
     title: '',
@@ -80,17 +81,45 @@ export default class AddPin extends PureComponent {
         </Fragment>}
       </div>
       <Mutation mutation={CREATE_PIN} key={url}>
-        {(mutate, { loading, error }) => {
+        {(mutate, { loading, error, client }) => {
           if (loading) return <Loading className={buttonClassBase} />
           return <Fragment>
             <button
               className={buttonClass + ' bold border-color1d'}
               disabled={imageError || !url || error}
               onClick={() => {
+                const user = client.readQuery({ query: LOCAL_USER }).localUser
                 mutate({
-                  variables: { url, title, description, token: this.props.token },
+                  variables: { url, title, description, token: user.token },
                   fetchPolicy: 'no-cache'
-                }).then(() => {
+                }).then(({ data }) => {
+                  const uid = user.id
+                  const pin = {
+                    id: data.createPin,
+                    ts: ~~(Date.now() / 1000),
+                    uid,
+                    url,
+                    title,
+                    description,
+                    __typename: 'pin'
+                  }
+                  try {
+                    const pins = client.readQuery({ query: PINS }).pins
+                    pins.unshift(pin)
+                    client.writeQuery({
+                      query: PINS,
+                      data: { pins }
+                    })
+                  } catch (e) {}
+                  try {
+                    const pins = client.readQuery({ query: PINS, variables: { uid } }).pins
+                    pins.unshift(pin)
+                    client.writeQuery({
+                      query: PINS,
+                      variables: { uid },
+                      data: { pins }
+                    })
+                  } catch (e) {}
                   this.unmounted || this.setState({ submitted: true })
                 })
               }}
