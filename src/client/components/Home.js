@@ -1,6 +1,7 @@
 import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { Query, Mutation } from 'react-apollo'
+import Masonry from 'react-masonry-component'
 
 import {
   PINS,
@@ -17,18 +18,23 @@ import {
 
 export default class Home extends PureComponent {
   render() {
-    return <Query query={PINS}>
-      {({ data, loading }) => {
-        if (loading) return LoadingFull
-        // return null
-        return (data.pins || []).map(pin => (
-          <Pin
-            key={pin.id}
-            {...pin}
-          />
-        ))
-      }}
-    </Query>
+    return (
+      <Query query={PINS}>
+        {({ data, loading }) => {
+          if (loading) return LoadingFull
+          const pins = (data.pins || []).map((pin, i) => (
+            <Pin
+              key={pin.id}
+              {...pin}
+              i={i}
+            />
+          ))
+          return <Masonry>
+            {pins}
+          </Masonry>
+        }}
+      </Query>
+    )
   }
 }
 
@@ -38,20 +44,22 @@ class Pin extends PureComponent {
     uid: PropTypes.number.isRequired,
     title: PropTypes.string,
     url: PropTypes.string.isRequired,
-    className: PropTypes.string,
     style: PropTypes.object,
   }
 
   render() {
-    const { title, url, style } = this.props
-    return <div className="m1">
+    const { title, url } = this.props
+    return <div className="m1" style={{ width: '15rem' }}>
       <img
         src={url}
         className="mb1 block col-12 rounded1"
-        style={style}
-        onError={e => { e.currentTarget.src = require('./imageNotFound.jpg') }}
+        onError={onError}
       />
-      <span>{title}</span>
+      <span>{this.props.i} {title}</span>
     </div>
   }
+}
+
+function onError(e) {
+  e.currentTarget.src = require('./imageNotFound.jpg')
 }
