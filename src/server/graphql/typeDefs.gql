@@ -1,5 +1,5 @@
 type Query {
-  pins(uid: Int): [pins]!
+  pins(uid: Int): [pin]!
   GHclientId: String!
 }
 
@@ -22,7 +22,7 @@ type LoggedInUser {
   token: String
 }
 
-type pins {
+type pin {
   id: Int!
   ts: Int
   uid: Int!
