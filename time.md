@@ -43,3 +43,5 @@ UI for home, pins, resolver
 read about css mansory 
 20180826  0.5
 reading on mansory
+20180827  0.5
+reading
