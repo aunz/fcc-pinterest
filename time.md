@@ -40,8 +40,10 @@ login components
 20180824  4
 UI for home, pins, resolver
 20180825  1
-read about css mansory 
+read about css masonry 
 20180826  0.5
-reading on mansory
+reading on masonry
 20180827  0.5
 reading
+20180828  3
+Masory component for Home
