@@ -1,5 +1,6 @@
 type Query {
-  pins(uid: Int): [pin]!
+  pins(uid: Int): [Pin]!
+  user(uid: Int!): User!
   GHclientId: String!
 }
 
@@ -12,6 +13,12 @@ type Mutation {
 
 }
 
+type User {
+  id: Int!
+  name: String
+  gh_name: String
+}
+
 type LoggedInUser {
   id: Int!
   ts: Int
@@ -22,7 +29,7 @@ type LoggedInUser {
   token: String
 }
 
-type pin {
+type Pin {
   id: Int!
   ts: Int
   uid: Int!
