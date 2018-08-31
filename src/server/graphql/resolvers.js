@@ -18,6 +18,7 @@ import {
   delToken,
   createPin,
   getPins,
+  getUser,
   delPin,
 } from '~/server/db/dbFunctions'
 
@@ -29,6 +30,7 @@ export default {
   Query: {
     pins(_, { uid }) { return getPins(uid) },
     GHclientId() { return GH_CLIENT_ID },
+    user(_, { id }) { return getUser(id) }
   },
   Mutation: {
     createUserWithEmail(_, { name, email, pw }) {
