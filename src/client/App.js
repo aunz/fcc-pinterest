@@ -7,7 +7,7 @@ import './styles/index.css'
 import { LOCAL_USER } from './apolloClient'
 
 import Header from './components/Header'
-import Home from './components/Home'
+import Pins from './components/Home'
 import User from './components/User'
 import AddPin from './components/AddPin'
 import { LoadingFull } from './components/common'
@@ -22,8 +22,9 @@ class App extends Component {
           return <Fragment>
             <Header loggedIn={loggedIn} />
             <Switch>
-              <Route exact path="/" render={() => <Home />} />
+              <Route exact path="/" component={Pins} />
               <Route path="/user" render={() => loading ? LoadingFull : <User loggedIn={loggedIn} />} />
+              <Route exact path="/u/:id" component={Pins} />
               {loggedIn && <Route path="/addPin" render={() => <AddPin token={user.token} />} />}
             </Switch>
           </Fragment>
