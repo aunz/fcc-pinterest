@@ -84,8 +84,8 @@ export function delToken(token) {
   return db.prepare('update "user" set token = null, token_ts = null, token_ts_exp = null where token = ?').run(digest.token).changes
 }
 
-export function getUser(uid) {
-  return db.prepare('select id, name, gh_name from "user" where id = ?').get(uid)
+export function getUser(id) {
+  return db.prepare('select id, name, gh_name from "user" where id = ?').get(id)
 }
 
 export function createPin({ uid, url, title, description }) {
