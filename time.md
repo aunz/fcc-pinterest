@@ -49,3 +49,5 @@ reading
 Masory component for Home
 20180829  0.5
 Masory
+20180831  3
+Pins, add user, typedef user, resolver user, dbFunction user
