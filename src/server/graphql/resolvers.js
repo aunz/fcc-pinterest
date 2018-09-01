@@ -57,6 +57,13 @@ export default {
       throw errInput('Provider is invalid')
     },
     logout(_, { token }) { return delToken(token) },
+    updateUser(_, { token, key, value }) {
+      if (!token || !key) throw errInput()
+      if (!['name'].includes(key)) throw errInput() // can only update name
+      const uid = getUid(token)
+      value = value.trim()
+      return updateUser(uid, { [key]: value })
+    },
     createPin(_, { url, token, title, description }) {
       url = url.trim()
       if (!isURL(url, { protocols: ['http', 'https'] })) throw errInput('url is invalid')

@@ -8,9 +8,9 @@ type Mutation {
   createUserWithEmail(name: String, email: String!, pw: String!): LoggedInUser
   loginWith(provider: provider!, email: String!, code: String!): LoggedInUser
   logout(token: String!): Int
-  createPin(url: String!, token: String!, title: String, description: String): Int
-  delPin(id: Int!, token: String!): Int
-
+  updateUser(token: String!, key: String!, value: String!): Int!
+  createPin(token: String!, url: String!, title: String, description: String): Int
+  delPin(token: String!, id: Int!): Int
 }
 
 type User {

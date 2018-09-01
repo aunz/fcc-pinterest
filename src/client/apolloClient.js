@@ -12,11 +12,12 @@ export const LOG_IN = gql`${__LOG_IN} @client }`
 
 export const LOG_OUT = gql`mutation { logout @client }`
 
+export const GH_CLIENT_ID = gql`query { GHclientId }`
 export const CREATE_PIN = gql`mutation createPin($url: String!, $token: String!, $title: String, $description: String) { createPin(url: $url, token: $token, title: $title, description: $description) }`
 export const DEL_PIN = gql`mutation delPin($id: Int!, $token: String!) { delPin(id: $id, token: $token) }`
 export const PINS = gql`query pins($uid: Int) { pins(uid: $uid) { id ts uid url title description } }`
 export const USER = gql`query user($id: Int!) { user(id: $id) { id name gh_name } } `
-export const GH_CLIENT_ID = gql`query { GHclientId }`
+export const UPDATE_USER = gql`mutation updateUser($token: String!, $key: String!, $value: String!) { updateUser(token: $token, key: $key, value: $value) }`
 
 const client = new ApolloClient({
   clientState: {
