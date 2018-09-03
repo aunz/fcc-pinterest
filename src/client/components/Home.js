@@ -7,6 +7,8 @@ import Masonry from 'react-masonry-component'
 import {
   PINS,
   USER,
+  LOCAL_USER,
+  DEL_PIN,
 } from '~/client/apolloClient'
 
 import {
@@ -57,14 +59,20 @@ export default class Pins extends PureComponent {
 
 class Pin extends PureComponent {
   static propTypes = {
+    id: PropTypes.number.isRequired,
     uid: PropTypes.number.isRequired,
     title: PropTypes.string,
     url: PropTypes.string.isRequired,
     ownerMode: PropTypes.bool,
   }
-
+  state = {
+    prompt: false
+  }
+  togglePrompt = () => {
+    this.setState({ prompt: !this.state.prompt })
+  }
   render() {
-    const { title, url, uid, ownerMode } = this.props
+    const { title, url, id, uid, ownerMode } = this.props
     return <div className="flex flex-column m1 mb2" style={{ width: '15rem' }}>
       <img
         src={url}
@@ -76,15 +84,57 @@ class Pin extends PureComponent {
         {({ data }) => {
           if (data && data.user) {
             const name = data.user.name || data.user.gh_name || 'Mysterion'
-            if (ownerMode) return ''
+            const className = buttonClassBase + ' border-none '
+            const { prompt } = this.state
+            if (ownerMode) return <Fragment>
+              <button
+                className={className + ' ml-auto  icon-trash-empty align-left'}
+                onClick={this.togglePrompt}
+              />
+              {prompt && <Mutation mutation={DEL_PIN} >
+                {(mutate, { loading, error, client }) => {
+                  const style = { fontFamily: 'fontello' }
+                  return <div className="absolute flex flex-column justify-center items-center center trbl0 bg-fff-o">
+                    <span>Delete the pin?</span>
+                    {loading ? <Loading /> : <div>
+                      <button
+                        className={className + 'mr2'}
+                        onClick={() => {
+                          const user = client.readQuery({ query: LOCAL_USER }).localUser
+                          mutate({ variables: { token: user.token, id }, fetchPolicy: 'no-cache' })
+                            .then(({ data: { delPin } }) => {
+                              if (delPin) {
+                                // update the client data where uid is set
+                                const options = { query: PINS, variables: { uid } }
+                                options.data = {
+                                  pins: client.readQuery(options).pins.filter(pin => pin.id !== id)
+                                }
+                                client.writeQuery(options)
+
+                                // upddate all the pins
+                                options.variables = {}
+                                try { // try here as the pins without uid may have not been fetched
+                                  options.data = {
+                                    pins: client.readQuery(options).pins.filter(pin => pin.id !== id)
+                                  }
+                                  client.writeQuery(options)
+                                } catch (e) {}
+                              }
+                            })
+                        }}
+                        style={style}
+                      >
+                        &#xe806;
+                      </button>
+                      <button className={className} onClick={this.togglePrompt} style={style}>&#xe807;</button>
+                    </div>}
+                    {error && <ErrorMessage error="Cannot delete the pin" />}
+                  </div>
+                }}
+              </Mutation>}
+            </Fragment>
             return <span className="silver">
-              by
-              <Link
-                className="italic text-decoration-none "
-                to={'/u/' + uid}
-              >
-                {name}
-              </Link>
+              by <Link className="italic text-decoration-none " to={'/u/' + uid} >{name}</Link>
             </span>
           }
           return null
