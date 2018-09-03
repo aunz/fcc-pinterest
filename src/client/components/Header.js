@@ -21,7 +21,7 @@ export default class Header extends PureComponent {
           />
         )}
         <Link
-          to="user"
+          to="/user"
           className={linkClass + 'icon-user'}
         />
       </div>
