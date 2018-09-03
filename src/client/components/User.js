@@ -4,12 +4,15 @@ import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { Query, Mutation } from 'react-apollo'
 
+import { Link } from 'react-router-dom'
+
 import isEmail from 'validator/lib/isEmail'
 
 import {
   LOCAL_USER,
   CREATE_USER,
   LOG_IN, LOG_OUT,
+  UPDATE_USER,
   GH_CLIENT_ID,
 } from '~/client/apolloClient'
 
@@ -19,6 +22,7 @@ import {
   borderRadius,
   inputClass,
   buttonClass,
+  inputClassBase,
 } from './common'
 
 export default class User extends PureComponent {
@@ -26,7 +30,9 @@ export default class User extends PureComponent {
   render() {
     return (
       <div className="flex flex-column mx-auto center" style={{ maxWidth: '20rem' }}>
-        {this.props.loggedIn ? <Logout /> : <Fragment><Login /><Signup /></Fragment>}
+        {this.props.loggedIn
+          ? <Fragment><UserDetail /><UserPin /><Logout /></Fragment>
+          : <Fragment><Login /><Signup /></Fragment>}
       </div>
     )
   }
@@ -297,16 +303,111 @@ class Signup extends PureComponent {
   }
 }
 
-class Logout extends PureComponent {
+class UserDetail extends PureComponent {
+  state = {
+    editMode: false,
+    newName: '',
+  }
+  componentWillUnmount() {
+    this.unmounted = true
+  }
+  toggleEdit = e => {
+    const oriName = e && e.currentTarget.dataset.oriName
+    const editMode = !this.state.editMode
+    this.setState({
+      editMode,
+      newName: oriName || ''
+    })
+  }
+  onInput = e => {
+    const { name, value } = e.currentTarget
+    this.setState({
+      [name]: value,
+    })
+  }
   render() {
-    return <Fragment>
+    const { editMode, newName } = this.state
+    return (
       <Query query={LOCAL_USER}>
         {({ data: { localUser } }) => {
+          const name = localUser.name || localUser.gh_name || ''
+          const element = editMode
+            ? (
+              <input
+                className="border-none outline-none"
+                style={{ maxWidth: '10rem', borderBottom: '1px solid silver' }}
+                autoFocus
+                type="text"
+                name="newName"
+                onChange={this.onInput}
+                value={newName}
+              />
+            )
+            : <i>{name || 'Mysterion'}</i>
+          const className = buttonClass + ' ml1 h6 silver border-none'
+          const buttonStyle = { fontFamily: 'fontello' }
+          const value = newName.trim()
           return (
-            <h3>Hello, <i>{localUser.name || localUser.gh_name || 'Anonymous'}</i>!</h3>
+            <h3>
+              Hello, {element}!
+              {editMode
+                ? <Mutation
+                  mutation={UPDATE_USER}
+                  fetchPolicy="no-cache"
+                  variables={{ token: localUser.token, key: 'name', value }}
+                  key={value} // so error below will be cleared with new value
+                >
+                  {(mutate, { loading, error, client }) => {
+                    if (loading) return <Loading className={className} />
+                    if (error) return <ErrorMessage error="Cannot change name" className={className + ' red'} />
+                    return <Fragment>
+                      <button
+                        className={className + ' color1'}
+                        style={buttonStyle}
+                        data-ori-name={name}
+                        onClick={() => {
+                          mutate()
+                            .then(({ data: { updateUser } }) => {
+                              if (!updateUser) return
+                              client.writeQuery({
+                                query: LOCAL_USER,
+                                data: { localUser: { ...localUser, name: value } }
+                              })
+                              this.unmounted || this.toggleEdit()
+                            })
+                        }}
+                      >
+                        &#xe806;
+                      </button>
+                      <button className={className} onClick={this.toggleEdit} style={buttonStyle}>&#xe807;</button>
+                    </Fragment>
+                  }}
+                </Mutation>
+                : <button className={className} onClick={this.toggleEdit} data-ori-name={name}>EDIT</button>
+              }
+            </h3>
           )
         }}
       </Query>
+    )
+  }
+}
+
+class UserPin extends PureComponent {
+  render() {
+    return <Query query={LOCAL_USER}>
+      {({ data: { localUser } }) => {
+        return <div className="mb3 left-align">
+          My pins <Link to={'/u/' + localUser.id} className="ml1 text-decoration-none" style={{ fontFamily: 'fontello' }}>&#xf08e;</Link>
+        </div>
+      }}
+    </Query>
+  }
+}
+
+class Logout extends PureComponent {
+  render() {
+    return (
       <Mutation mutation={LOG_OUT}>
         {mutate => (
           <input
@@ -317,7 +418,7 @@ class Logout extends PureComponent {
           />
         )}
       </Mutation>
-    </Fragment>
+    )
   }
 }
 
