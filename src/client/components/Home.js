@@ -25,20 +25,25 @@ export default class Pins extends PureComponent {
         id: PropTypes.string,
       }).isRequired,
     }).isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.number
+    })
   }
   render() {
     const oriId = this.props.match.params.id
-    const uid = +oriId
-    if (Number.isNaN(uid)) return <div className="m3 h3 center">The user id <span className="red italic bold">{oriId}</span> is incorrect</div>
+    if (oriId && Number.isNaN(+oriId)) return <div className="m3 h3 center">The user id <span className="red italic bold">{oriId}</span> is incorrect</div>
+    const uid = ~~oriId
     return (
       <Query query={PINS} variables={{ uid }}>
         {({ data, loading }) => {
           if (loading) return LoadingFull
           if (!data.pins || !data.pins.length) return <div className="m3 h3 center">The user <i>{uid}</i> has not created any pin</div>
+          const ownerMode = this.props.user && this.props.user.id === uid // when true, allow Pin to be deleted
           const pins = data.pins.map((pin, i) => (
             <Pin
               key={pin.id}
               {...pin}
+              ownerMode={ownerMode}
             />
           ))
           return <Masonry>
@@ -52,15 +57,14 @@ export default class Pins extends PureComponent {
 
 class Pin extends PureComponent {
   static propTypes = {
-    id: PropTypes.number.isRequired,
     uid: PropTypes.number.isRequired,
     title: PropTypes.string,
     url: PropTypes.string.isRequired,
-    style: PropTypes.object,
+    ownerMode: PropTypes.bool,
   }
 
   render() {
-    const { title, url, uid } = this.props
+    const { title, url, uid, ownerMode } = this.props
     return <div className="flex flex-column m1 mb2" style={{ width: '15rem' }}>
       <img
         src={url}
@@ -72,17 +76,16 @@ class Pin extends PureComponent {
         {({ data }) => {
           if (data && data.user) {
             const name = data.user.name || data.user.gh_name || 'Mysterion'
-            return (
-              <span>
-                <span className="silver">by </span>
-                <Link
-                  className="italic text-decoration-none "
-                  to={'/u/' + uid}
-                >
-                  {name}
-                </Link>
-              </span>
-            )
+            if (ownerMode) return ''
+            return <span className="silver">
+              by
+              <Link
+                className="italic text-decoration-none "
+                to={'/u/' + uid}
+              >
+                {name}
+              </Link>
+            </span>
           }
           return null
         }}
