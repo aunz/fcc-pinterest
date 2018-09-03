@@ -24,7 +24,7 @@ class App extends Component {
             <Switch>
               <Route exact path="/" component={Pins} />
               <Route path="/user" render={() => loading ? LoadingFull : <User loggedIn={loggedIn} />} />
-              <Route exact path="/u/:id" component={Pins} />
+              <Route exact path="/u/:id" render={route => <Pins {...route} user={user} />} />
               {loggedIn && <Route path="/addPin" render={() => <AddPin token={user.token} />} />}
             </Switch>
           </Fragment>
