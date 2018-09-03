@@ -1,10 +1,12 @@
 import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { Query, Mutation } from 'react-apollo'
 import Masonry from 'react-masonry-component'
 
 import {
   PINS,
+  USER,
 } from '~/client/apolloClient'
 
 import {
@@ -16,17 +18,27 @@ import {
   buttonClassBase,
 } from './common'
 
-export default class Home extends PureComponent {
+export default class Pins extends PureComponent {
+  static propTypes = {
+    match: PropTypes.shape({
+      params: PropTypes.shape({
+        id: PropTypes.string,
+      }).isRequired,
+    }).isRequired,
+  }
   render() {
+    const oriId = this.props.match.params.id
+    const uid = +oriId
+    if (Number.isNaN(uid)) return <div className="m3 h3 center">The user id <span className="red italic bold">{oriId}</span> is incorrect</div>
     return (
-      <Query query={PINS}>
+      <Query query={PINS} variables={{ uid }}>
         {({ data, loading }) => {
           if (loading) return LoadingFull
-          const pins = (data.pins || []).map((pin, i) => (
+          if (!data.pins || !data.pins.length) return <div className="m3 h3 center">The user <i>{uid}</i> has not created any pin</div>
+          const pins = data.pins.map((pin, i) => (
             <Pin
               key={pin.id}
               {...pin}
-              i={i}
             />
           ))
           return <Masonry>
@@ -48,14 +60,33 @@ class Pin extends PureComponent {
   }
 
   render() {
-    const { title, url } = this.props
-    return <div className="m1" style={{ width: '15rem' }}>
+    const { title, url, uid } = this.props
+    return <div className="flex flex-column m1 mb2" style={{ width: '15rem' }}>
       <img
         src={url}
-        className="mb1 block col-12 rounded1"
+        className="mb1 col-12 rounded1"
         onError={onError}
       />
-      <span>{this.props.i} {title}</span>
+      <span>{title}</span>
+      <Query query={USER} variables={{ id: uid }}>
+        {({ data }) => {
+          if (data && data.user) {
+            const name = data.user.name || data.user.gh_name || 'Mysterion'
+            return (
+              <span>
+                <span className="silver">by </span>
+                <Link
+                  className="italic text-decoration-none "
+                  to={'/u/' + uid}
+                >
+                  {name}
+                </Link>
+              </span>
+            )
+          }
+          return null
+        }}
+      </Query>
     </div>
   }
 }
