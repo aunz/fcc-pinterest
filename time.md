@@ -51,3 +51,5 @@ Masory component for Home
 Masory
 20180831  3
 Pins, add user, typedef user, resolver user, dbFunction user
+20180902  2
+user
