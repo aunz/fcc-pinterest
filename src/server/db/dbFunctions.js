@@ -104,7 +104,7 @@ export function getPins(uid) {
 }
 
 export function delPin(id, uid) {
-  return db.prepare('update pin set del = $now where id = $id and uid = $uid').run({ now: ~~(Date.now() / 1000), id, uid }).changes
+  return db.prepare('update pin set del = $now where id = $id and uid = $uid and del is null').run({ now: ~~(Date.now() / 1000), id, uid }).changes
 }
 
 function createEntity(table, object) {
