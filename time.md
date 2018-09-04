@@ -53,3 +53,5 @@ Masory
 Pins, add user, typedef user, resolver user, dbFunction user
 20180902  2
 user
+20180903  3
+user, pins deletion
