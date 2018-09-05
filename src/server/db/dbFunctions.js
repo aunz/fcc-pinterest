@@ -99,7 +99,7 @@ export function createPin({ uid, url, title, description }) {
 
 export function getPins(uid) {
   const where = 'where del is null' + (uid ? ' and uid = ?' : '')
-  const stmt = db.prepare(`select id, uid, ts, title, url from pin ${where} order by rowid desc`)
+  const stmt = db.prepare(`select id, uid, url, ts, title, description from pin ${where} order by rowid desc`)
   return uid ? stmt.all(uid) : stmt.all()
 }
 
