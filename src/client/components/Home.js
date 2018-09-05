@@ -98,35 +98,35 @@ class Pin extends PureComponent {
                     <span>Delete the pin?</span>
                     {loading ? <Loading /> : <div>
                       <button
-                        className={className + 'mr2'}
+                        className={className + ' mr2'}
+                        style={style}
                         onClick={() => {
-                          const user = client.readQuery({ query: LOCAL_USER }).localUser
-                          mutate({ variables: { token: user.token, id }, fetchPolicy: 'no-cache' })
+                          const { token } = client.readQuery({ query: LOCAL_USER }).localUser
+                          mutate({ variables: { token, id }, fetchPolicy: 'no-cache' })
                             .then(({ data: { delPin } }) => {
                               if (delPin) {
-                                // update the client data where uid is set
-                                const options = { query: PINS, variables: { uid } }
-                                options.data = {
-                                  pins: client.readQuery(options).pins.filter(pin => pin.id !== id)
-                                }
-                                client.writeQuery(options)
-
-                                // upddate all the pins
-                                options.variables = {}
-                                try { // try here as the pins without uid may have not been fetched
+                                // update all the pins
+                                const options = { query: PINS }
+                                try { // try here as pins without uid may have not been fetched
                                   options.data = {
                                     pins: client.readQuery(options).pins.filter(pin => pin.id !== id)
                                   }
                                   client.writeQuery(options)
                                 } catch (e) {}
+
+                                // update pins where uid is set
+                                options.variables = { uid }
+                                options.data = {
+                                  pins: client.readQuery(options).pins.filter(pin => pin.id !== id)
+                                }
+                                client.writeQuery(options)
                               }
                             })
                         }}
-                        style={style}
                       >
                         &#xe806;
                       </button>
-                      <button className={className} onClick={this.togglePrompt} style={style}>&#xe807;</button>
+                      <button className={className} style={style} onClick={this.togglePrompt}>&#xe807;</button>
                     </div>}
                     {error && <ErrorMessage error="Cannot delete the pin" />}
                   </div>
