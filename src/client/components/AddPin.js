@@ -101,10 +101,10 @@ export default class AddPin extends PureComponent {
                     url,
                     title,
                     description,
-                    __typename: 'pin'
+                    __typename: 'Pin',
                   }
                   try {
-                    const pins = client.readQuery({ query: PINS }).pins
+                    const { pins } = client.readQuery({ query: PINS })
                     pins.unshift(pin)
                     client.writeQuery({
                       query: PINS,
@@ -112,7 +112,7 @@ export default class AddPin extends PureComponent {
                     })
                   } catch (e) {}
                   try {
-                    const pins = client.readQuery({ query: PINS, variables: { uid } }).pins
+                    const { pins } = client.readQuery({ query: PINS, variables: { uid } })
                     pins.unshift(pin)
                     client.writeQuery({
                       query: PINS,

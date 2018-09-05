@@ -36,7 +36,7 @@ export default class Pins extends PureComponent {
     if (oriId && Number.isNaN(+oriId)) return <div className="m3 h3 center">The user id <span className="red italic bold">{oriId}</span> is incorrect</div>
     const uid = ~~oriId
     return (
-      <Query query={PINS} variables={{ uid }}>
+      <Query query={PINS} variables={{ uid: uid || undefined }}>
         {({ data, loading }) => {
           if (loading) return LoadingFull
           if (!data.pins || !data.pins.length) return <div className="m3 h3 center">The user <i>{uid}</i> has not created any pin</div>
