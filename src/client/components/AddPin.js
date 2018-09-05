@@ -67,7 +67,7 @@ export default class AddPin extends PureComponent {
         className={inputClass}
         placeholder="desription (optional)"
         style={{ minWidth, borderTop: 'none' }}
-        name="desription"
+        name="description"
         onChange={this.onChange}
       />
       <div className="my2 p1 flex flex-column items-center" style={{ maxWidth: '100vw' }} >
