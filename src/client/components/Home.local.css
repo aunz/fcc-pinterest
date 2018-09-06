@@ -1,0 +1,8 @@
+.pin {
+  width: 12rem;
+  border-radius: 6px;
+  transition: all 0.5s;
+  &:hover {
+    background-color: #3331;
+  }
+}

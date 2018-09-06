@@ -1,4 +1,5 @@
 import React, { PureComponent, Fragment } from 'react'
+import ReactDom from 'react-dom'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Query, Mutation } from 'react-apollo'
@@ -15,10 +16,10 @@ import {
   Loading,
   LoadingFull,
   ErrorMessage,
-  inputClass,
-  buttonClass,
   buttonClassBase,
 } from './common'
+
+import styles from './Home.local.css'
 
 export default class Pins extends PureComponent {
   static propTypes = {
@@ -57,27 +58,33 @@ export default class Pins extends PureComponent {
   }
 }
 
+const pinClassName = 'flex flex-column mb2 p2 ' + styles.pin
 class Pin extends PureComponent {
   static propTypes = {
     id: PropTypes.number.isRequired,
     uid: PropTypes.number.isRequired,
-    title: PropTypes.string,
     url: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    description: PropTypes.string,
     ownerMode: PropTypes.bool,
   }
   state = {
-    prompt: false
+    showModal: false,
+    prompt: false,
   }
-  togglePrompt = () => {
-    this.setState({ prompt: !this.state.prompt })
+  toggleModal = e => {
+    if (e && e.currentTarget.hasError) return
+    this.setState({ showModal: !this.state.showModal })
   }
+  togglePrompt = () => { this.setState({ prompt: !this.state.prompt }) }
   render() {
-    const { title, url, id, uid, ownerMode } = this.props
-    return <div className="flex flex-column m1 mb2" style={{ width: '15rem' }}>
+    const { url, id, uid, title, description, ownerMode } = this.props
+    return <div className={pinClassName}>
       <img
         src={url}
-        className="mb1 col-12 rounded1"
+        className="mb1 col-12 rounded1 pointer"
         onError={onError}
+        onClick={this.toggleModal}
       />
       <span>{title}</span>
       <Query query={USER} variables={{ id: uid }}>
@@ -140,10 +147,26 @@ class Pin extends PureComponent {
           return null
         }}
       </Query>
+      {this.state.showModal && ReactDom.createPortal(
+        <div className="fixed p1 flex flex-column justify-center items-center trbl0 bg-fff-o overflow-auto overscroll-contain">
+          <img
+            src={url}
+            className="fit pointer"
+            onClick={e => {
+              console.log(e.currentTarget)
+              this.toggleModal()
+            }}
+          />
+          <span>{title}</span>
+          <span>{description}</span>
+        </div>,
+        document.getElementById('root2')
+      )}
     </div>
   }
 }
 
 function onError(e) {
   e.currentTarget.src = require('./imageNotFound.jpg')
+  e.currentTarget.hasError = true
 }
